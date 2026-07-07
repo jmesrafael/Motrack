@@ -8,8 +8,8 @@ import { useTheme } from '@/theme/useTheme';
 import type { HealthBandId } from '@/types/domain';
 
 export interface HealthHeroProps {
-  score: number;
-  bandId: HealthBandId;
+  score: number | null;
+  bandId: HealthBandId | null;
   bandLabel: string;
   onPress: () => void;
 }
@@ -38,22 +38,18 @@ const useStyles = makeStyles((t) =>
 export function HealthHero({ score, bandId, bandLabel, onPress }: HealthHeroProps) {
   const styles = useStyles();
   const { tokens } = useTheme();
+  const a11yLabel = interpolate(strings.dashboard.health.a11y, { score: score ?? '—', band: bandLabel });
 
   return (
-    <Card
-      onPress={onPress}
-      accessibilityLabel={interpolate(strings.dashboard.health.a11y, { score, band: bandLabel })}>
+    <Card onPress={onPress} accessibilityLabel={a11yLabel}>
       <View style={styles.inner}>
         <HealthRing
           score={score}
           bandLabel={bandLabel}
-          color={tokens.health[bandId]}
-          colorBg={tokens.status[BAND_TINT[bandId]].bg}
+          color={bandId !== null ? tokens.health[bandId] : tokens.status.neutral.base}
+          colorBg={bandId !== null ? tokens.status[BAND_TINT[bandId]].bg : tokens.status.neutral.bg}
           scoreSuffix={strings.dashboard.health.scoreOf}
-          accessibilityLabel={interpolate(strings.dashboard.health.a11y, {
-            score,
-            band: bandLabel,
-          })}
+          accessibilityLabel={a11yLabel}
         />
         <Text style={styles.caption}>{strings.dashboard.health.caption}</Text>
       </View>

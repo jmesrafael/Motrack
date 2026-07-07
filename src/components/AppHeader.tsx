@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Icon } from '@/components/Icon';
 import { makeStyles, typeStyle } from '@/theme/styles';
 import { useTheme } from '@/theme/useTheme';
+import { TutorialAnchor } from '@/tutorial/ui/TutorialAnchor';
 
 export interface AppHeaderProps {
   bikeLabel: string;
@@ -14,6 +15,8 @@ export interface AppHeaderProps {
   onRemindersPress: () => void;
   /** Extra header action slot (validation phase hosts the theme switcher). */
   trailing?: ReactNode;
+  /** Registers the bike chip as a tutorial target (dashboard tour). */
+  bikeChipAnchorId?: string;
 }
 
 const useStyles = makeStyles((t) =>
@@ -35,6 +38,9 @@ const useStyles = makeStyles((t) =>
     },
     bikeLabel: {
       ...typeStyle(t.type.bodyStrong, t.text.primary),
+      flexShrink: 1,
+    },
+    chipWrap: {
       flexShrink: 1,
     },
     spacer: {
@@ -75,23 +81,34 @@ export function AppHeader({
   remindersA11yLabel,
   onRemindersPress,
   trailing,
+  bikeChipAnchorId,
 }: AppHeaderProps) {
   const styles = useStyles();
   const { tokens } = useTheme();
 
+  const bikeChip = (
+    <Pressable
+      onPress={onBikePress}
+      accessibilityRole="button"
+      accessibilityLabel={bikeA11yLabel}
+      style={({ pressed }) => [styles.bikeChip, pressed && { opacity: 0.7 }]}>
+      <Icon name="motorcycle" size={tokens.iconSize.listLeading} />
+      <Text style={styles.bikeLabel} numberOfLines={1}>
+        {bikeLabel}
+      </Text>
+      <Icon name="chevronDown" size={tokens.iconSize.inline} color={tokens.icon.secondary} />
+    </Pressable>
+  );
+
   return (
     <View style={styles.row}>
-      <Pressable
-        onPress={onBikePress}
-        accessibilityRole="button"
-        accessibilityLabel={bikeA11yLabel}
-        style={({ pressed }) => [styles.bikeChip, pressed && { opacity: 0.7 }]}>
-        <Icon name="motorcycle" size={tokens.iconSize.listLeading} />
-        <Text style={styles.bikeLabel} numberOfLines={1}>
-          {bikeLabel}
-        </Text>
-        <Icon name="chevronDown" size={tokens.iconSize.inline} color={tokens.icon.secondary} />
-      </Pressable>
+      {bikeChipAnchorId !== undefined ? (
+        <TutorialAnchor id={bikeChipAnchorId} style={styles.chipWrap}>
+          {bikeChip}
+        </TutorialAnchor>
+      ) : (
+        bikeChip
+      )}
       <View style={styles.spacer} />
       {trailing}
       <Pressable

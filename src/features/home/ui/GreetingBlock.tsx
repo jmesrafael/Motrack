@@ -4,7 +4,6 @@ import { makeStyles, typeStyle } from '@/theme/styles';
 
 export interface GreetingBlockProps {
   greeting: string;
-  riderName: string;
   dateLabel: string;
 }
 
@@ -19,12 +18,12 @@ const useStyles = makeStyles((t) =>
   }),
 );
 
-export function GreetingBlock({ greeting, riderName, dateLabel }: GreetingBlockProps) {
+export function GreetingBlock({ greeting, dateLabel }: GreetingBlockProps) {
   const styles = useStyles();
   return (
     <View style={styles.block}>
       <Text style={styles.title} accessibilityRole="header">
-        {`${greeting}, ${riderName}`}
+        {greeting}
       </Text>
       <Text style={styles.date}>{dateLabel}</Text>
     </View>

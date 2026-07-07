@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Icon, type IconName } from '@/components/Icon';
 import { makeStyles, typeStyle } from '@/theme/styles';
 import { useTheme } from '@/theme/useTheme';
+import { TutorialAnchor } from '@/tutorial/ui/TutorialAnchor';
 
 /** 5 tabs with the raised center Log action (SCREEN_SPECIFICATIONS.md §0). */
 const TAB_ICONS: Record<string, { active: IconName; idle: IconName }> = {
@@ -24,8 +25,10 @@ const useStyles = makeStyles((t) =>
       borderTopWidth: StyleSheet.hairlineWidth,
       borderTopColor: t.border.divider,
     },
-    item: {
+    tabWrap: {
       flex: 1,
+    },
+    item: {
       alignItems: 'center',
       justifyContent: 'flex-end',
       paddingTop: t.space.s2,
@@ -76,21 +79,22 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
 
         if (route.name === CENTER_ROUTE) {
           return (
-            <Pressable
-              key={route.key}
-              onPress={onPress}
-              accessibilityRole="button"
-              accessibilityLabel={label}
-              style={styles.item}>
-              {({ pressed }) => (
-                <>
-                  <View style={[styles.centerButton, pressed && styles.centerButtonPressed]}>
-                    <Icon name="plus" size={tokens.iconSize.feature} color={tokens.primary.on} />
-                  </View>
-                  <Text style={styles.label}>{label}</Text>
-                </>
-              )}
-            </Pressable>
+            <TutorialAnchor key={route.key} id={`tab.${route.name}`} style={styles.tabWrap}>
+              <Pressable
+                onPress={onPress}
+                accessibilityRole="button"
+                accessibilityLabel={label}
+                style={styles.item}>
+                {({ pressed }) => (
+                  <>
+                    <View style={[styles.centerButton, pressed && styles.centerButtonPressed]}>
+                      <Icon name="plus" size={tokens.iconSize.feature} color={tokens.primary.on} />
+                    </View>
+                    <Text style={styles.label}>{label}</Text>
+                  </>
+                )}
+              </Pressable>
+            </TutorialAnchor>
           );
         }
 
@@ -98,20 +102,21 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
         const iconName = icons === undefined ? 'more' : isFocused ? icons.active : icons.idle;
 
         return (
-          <Pressable
-            key={route.key}
-            onPress={onPress}
-            accessibilityRole="tab"
-            accessibilityState={{ selected: isFocused }}
-            accessibilityLabel={label}
-            style={({ pressed }) => [styles.item, pressed && { opacity: 0.7 }]}>
-            <Icon
-              name={iconName}
-              size={tokens.iconSize.md}
-              color={isFocused ? tokens.primary.base : tokens.icon.secondary}
-            />
-            <Text style={isFocused ? styles.labelActive : styles.label}>{label}</Text>
-          </Pressable>
+          <TutorialAnchor key={route.key} id={`tab.${route.name}`} style={styles.tabWrap}>
+            <Pressable
+              onPress={onPress}
+              accessibilityRole="tab"
+              accessibilityState={{ selected: isFocused }}
+              accessibilityLabel={label}
+              style={({ pressed }) => [styles.item, pressed && { opacity: 0.7 }]}>
+              <Icon
+                name={iconName}
+                size={tokens.iconSize.md}
+                color={isFocused ? tokens.primary.base : tokens.icon.secondary}
+              />
+              <Text style={isFocused ? styles.labelActive : styles.label}>{label}</Text>
+            </Pressable>
+          </TutorialAnchor>
         );
       })}
     </View>

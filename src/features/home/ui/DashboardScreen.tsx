@@ -1,15 +1,21 @@
 import { useRouter } from 'expo-router';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 
 import { AppHeader } from '@/components/AppHeader';
+import { EmptyState } from '@/components/EmptyState';
 import { ListSection } from '@/components/ListSection';
+import { PrimaryButton } from '@/components/PrimaryButton';
 import { ScheduleRow } from '@/components/ScheduleRow';
 import { Screen } from '@/components/Screen';
 import { TimelineItem } from '@/components/TimelineItem';
+import { useReminderStore } from '@/stores/useReminderStore';
 import { strings } from '@/i18n/strings';
 import { formatKm, formatMoney, formatMonthDay } from '@/lib/format';
+import { TutorialAnchor } from '@/tutorial/ui/TutorialAnchor';
+import { ResumeDialog, TourOfferDialog } from '@/tutorial/ui/TutorialDialogs';
 import type { ActivityVm } from '@/types/domain';
 import { useDashboardData } from '../hooks/useDashboardData';
+import { useTourOffer } from '../hooks/useTourOffer';
 import { DocumentWarningBanner } from './DocumentWarningBanner';
 import { GreetingBlock } from './GreetingBlock';
 import { HealthHero } from './HealthHero';
@@ -23,54 +29,97 @@ function activityCaption(entry: ActivityVm): string {
   return entry.odometerKm === undefined ? date : `${date} · ${formatKm(entry.odometerKm)}`;
 }
 
-/** S-04 Dashboard (SCREEN_SPECIFICATIONS.md) over fixture data. */
+/** S-04 Dashboard (SCREEN_SPECIFICATIONS.md) over live repository-backed data. */
 export function DashboardScreen() {
   const router = useRouter();
   const vm = useDashboardData();
+  const reminderCount = useReminderStore((s) => s.items.length);
+  const reminderStatus = useReminderStore((s) => s.status);
+  const loadReminders = useReminderStore((s) => s.load);
+  const tourOffer = useTourOffer(vm.hasBike);
+
+  useEffect(() => {
+    if (reminderStatus === 'idle') {
+      loadReminders();
+    }
+  }, [reminderStatus, loadReminders]);
+
+  const goGarage = useCallback(() => router.push('/garage'), [router]);
+  const goReminders = useCallback(() => router.push('/reminders'), [router]);
+  const goMaintenance = useCallback(() => router.push('/(tabs)/maintenance'), [router]);
+  const goOdometer = useCallback(() => router.push('/odometer'), [router]);
+  const goMoney = useCallback(() => router.push('/(tabs)/money'), [router]);
+
+  if (!vm.hasBike || vm.data === null) {
+    return (
+      <Screen scroll={false}>
+        <EmptyState
+          icon="motorcycle"
+          title="Add your first motorcycle"
+          body="Motrack tracks maintenance, fuel, and expenses per bike — add one to get started."
+        />
+        <PrimaryButton label="Add motorcycle" onPress={() => router.push('/bike/new')} />
+      </Screen>
+    );
+  }
+
   const { bike } = vm.data;
 
-  // Every tap target leads somewhere honest: the pending sheet until its
-  // real surface (switcher, S-05, S-11, S-12q, S-25, S-22) is approved.
-  const openPending = useCallback(() => {
-    router.push('/pending');
-  }, [router]);
-
   return (
-    <Screen>
+    <Screen tutorialScrollId="dashboard">
       <AppHeader
         bikeLabel={bike.nickname}
         bikeA11yLabel={`${bike.nickname}, ${bike.brand} ${bike.model}. ${strings.dashboard.bikeChipA11y}`}
-        onBikePress={openPending}
-        reminderCount={vm.attentionCount}
+        onBikePress={goGarage}
+        reminderCount={reminderCount}
         remindersA11yLabel={strings.dashboard.remindersA11y}
-        onRemindersPress={openPending}
+        onRemindersPress={goReminders}
         trailing={<ThemeCycleButton />}
+        bikeChipAnchorId="dashboard.bikeChip"
       />
-      <GreetingBlock greeting={vm.greeting} riderName={vm.data.riderName} dateLabel={vm.dateLabel} />
-      <HealthHero
-        score={vm.data.healthScore}
-        bandId={vm.bandId}
-        bandLabel={vm.bandLabel}
-        onPress={openPending}
-      />
-      <OdometerCard odometerKm={bike.odometerKm} asOfIso={bike.odometerAsOf} onUpdate={openPending} />
+      <GreetingBlock greeting={vm.greeting} dateLabel={vm.dateLabel} />
+      <TutorialAnchor id="dashboard.healthHero">
+        <HealthHero score={vm.data.healthScore} bandId={vm.bandId} bandLabel={vm.bandLabel} onPress={goMaintenance} />
+      </TutorialAnchor>
+      <TutorialAnchor id="dashboard.odometerCard">
+        <OdometerCard odometerKm={bike.odometerKm} asOfIso={bike.odometerAsOf} onUpdate={goOdometer} />
+      </TutorialAnchor>
       {vm.data.documentWarning !== undefined ? (
-        <DocumentWarningBanner message={vm.data.documentWarning.message} onPress={openPending} />
+        <DocumentWarningBanner
+          message={vm.data.documentWarning.message}
+          onPress={() => router.push('/documents')}
+        />
       ) : null}
       <ListSection title={strings.dashboard.nextMaintenance.title}>
-        {vm.data.upcoming.map((schedule) => (
-          <ScheduleRow
-            key={schedule.id}
-            icon={schedule.icon}
-            label={schedule.label}
-            status={schedule.status}
-            statusLabel={strings.dashboard.nextMaintenance.due[schedule.status]}
-            remainingText={schedule.remainingText}
-            onPress={openPending}
-          />
-        ))}
+        {vm.data.upcoming.length === 0 ? null : (
+          vm.data.upcoming.map((schedule) => (
+            <ScheduleRow
+              key={schedule.id}
+              icon={schedule.icon}
+              label={schedule.label}
+              status={schedule.status}
+              statusLabel={strings.dashboard.nextMaintenance.due[schedule.status]}
+              remainingText={schedule.remainingText}
+              onPress={() => router.push(`/maintenance/component/${schedule.id}`)}
+            />
+          ))
+        )}
       </ListSection>
-      <QuickActionsGrid onAction={openPending} />
+      <TutorialAnchor id="dashboard.quickActions">
+        <QuickActionsGrid
+          onAction={(actionId) => {
+            if (actionId === 'log-service') {
+              router.push('/maintenance/log');
+            } else if (actionId === 'add-fuel') {
+              router.push('/fuel/log');
+            } else if (actionId === 'add-expense') {
+              router.push('/expense/log');
+            } else {
+              goOdometer();
+            }
+          }}
+        />
+      </TutorialAnchor>
       <ListSection title={strings.dashboard.activity.title}>
         {vm.data.activity.map((entry) => (
           <TimelineItem
@@ -80,11 +129,23 @@ export function DashboardScreen() {
             caption={activityCaption(entry)}
             amount={formatMoney(entry.amountCentavos)}
             isRepair={entry.kind === 'repair'}
-            onPress={openPending}
+            onPress={goMoney}
           />
         ))}
       </ListSection>
-      <MonthlyStatsCard month={vm.data.month} onPress={openPending} />
+      <MonthlyStatsCard month={vm.data.month} onPress={goMoney} />
+      <TourOfferDialog
+        visible={tourOffer.offerVisible}
+        onStart={tourOffer.onStart}
+        onLater={tourOffer.onLater}
+        onNever={tourOffer.onNever}
+      />
+      <ResumeDialog
+        visible={tourOffer.resumeVisible}
+        onResume={tourOffer.onResume}
+        onRestart={tourOffer.onRestart}
+        onDismiss={tourOffer.onDismissResume}
+      />
     </Screen>
   );
 }

@@ -6,11 +6,11 @@ import { makeStyles, typeStyle } from '@/theme/styles';
 import { useTheme } from '@/theme/useTheme';
 
 export interface QuickActionsGridProps {
-  onAction: () => void;
+  onAction: (actionId: 'log-service' | 'add-fuel' | 'add-expense' | 'update-odo') => void;
 }
 
 interface QuickAction {
-  id: string;
+  id: 'log-service' | 'add-fuel' | 'add-expense' | 'update-odo';
   icon: IconName;
   label: string;
 }
@@ -76,7 +76,7 @@ export function QuickActionsGrid({ onAction }: QuickActionsGridProps) {
         {ACTIONS.map((action) => (
           <Pressable
             key={action.id}
-            onPress={onAction}
+            onPress={() => onAction(action.id)}
             accessibilityRole="button"
             accessibilityLabel={action.label}
             style={({ pressed }) => [styles.tile, pressed && { opacity: 0.7 }]}>
