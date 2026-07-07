@@ -1,36 +1,47 @@
 import { useMemo } from 'react';
 
+import { DocumentRepository } from '@/db/repositories/DocumentRepository';
+import { ExpenseRepository } from '@/db/repositories/ExpenseRepository';
+import { componentIcon, componentLabel } from '@/features/maintenance/componentMeta';
+import { useSchedules } from '@/features/maintenance/hooks/useSchedules';
+import { formatRemaining } from '@/features/maintenance/remainingText';
+import { useActiveBike } from '@/hooks/useActiveBike';
 import { strings } from '@/i18n/strings';
-import { formatFullDate } from '@/lib/format';
-import { dashboardFixture } from '@/testing/fixtures/dashboard';
-import type { DashboardData, HealthBandId } from '@/types/domain';
+import { addDays, todayIso } from '@/lib/dates';
+import { formatFullDate, formatMoney } from '@/lib/format';
+import { loadTimeline } from '@/services/TimelineService';
+import type { ChartTokens } from '@/theme/types';
+import type {
+  ActivityKind,
+  ActivityVm,
+  DashboardData,
+  HealthBandId,
+  MonthCategoryVm,
+} from '@/types/domain';
+import type { ComponentType, DocType } from '@/types/enums';
 
 export interface DashboardVm {
-  data: DashboardData;
+  data: DashboardData | null;
   greeting: string;
   dateLabel: string;
-  bandId: HealthBandId;
+  bandId: HealthBandId | null;
   bandLabel: string;
-  /** Due-soon + overdue count feeding the reminders badge. */
   attentionCount: number;
+  hasBike: boolean;
 }
 
-/** Display bands per HEALTH_SCORE.md §6 — display mapping only, no scoring logic. */
-function healthBandId(score: number): HealthBandId {
-  if (score >= 90) return 'excellent';
-  if (score >= 75) return 'good';
-  if (score >= 50) return 'fair';
-  if (score >= 25) return 'poor';
-  return 'critical';
+const CHART_SLOTS: (keyof ChartTokens)[] = ['slot1', 'slot2', 'slot3', 'slot4', 'slot5'];
+
+function timelineKindToActivityKind(kind: string): ActivityKind {
+  return kind === 'fuel' ? 'fuel' : kind === 'repair' ? 'repair' : 'maintenance';
 }
 
-/**
- * Validation phase: view model over the fixture. The real hook reads Zustand
- * view state fed by services/repositories (DATA_FLOW.md §3) — same shape.
- */
+/** Live dashboard view model (replaces the fixture — DATA_FLOW.md §2). */
 export function useDashboardData(): DashboardVm {
+  const { activeBike, ready: garageReady } = useActiveBike();
+  const { items, health } = useSchedules(activeBike?.id ?? null, activeBike?.currentOdometerKm ?? 0);
+
   return useMemo(() => {
-    const data = dashboardFixture;
     const hour = new Date().getHours();
     const greeting =
       hour < 12
@@ -38,15 +49,116 @@ export function useDashboardData(): DashboardVm {
         : hour < 18
           ? strings.dashboard.greeting.afternoon
           : strings.dashboard.greeting.evening;
-    const bandId = healthBandId(data.healthScore);
+
+    if (!garageReady || activeBike === null) {
+      return {
+        data: null,
+        greeting,
+        dateLabel: formatFullDate(new Date()),
+        bandId: null,
+        bandLabel: '',
+        attentionCount: 0,
+        hasBike: activeBike !== null,
+      };
+    }
+
+    const score = health?.score ?? null;
+    const bandId: HealthBandId | null = health?.band ?? null;
+    const bandLabel = bandId !== null ? strings.dashboard.band[bandId] : 'Finish setup';
+
+    const upcoming = [...items]
+      .filter((i) => i.status.status !== 'neutral')
+      .sort((a, b) => (b.status.ratio ?? 0) - (a.status.ratio ?? 0))
+      .slice(0, 5)
+      .map((i) => {
+        const componentType = i.schedule.componentType as ComponentType;
+        return {
+          id: i.schedule.id,
+          icon: componentIcon(componentType),
+          label: componentLabel(componentType, i.schedule.customName),
+          status: i.status.status,
+          remainingText: formatRemaining(i.status),
+        };
+      });
+
+    const today = todayIso();
+    const soon = addDays(today, 30);
+    const expiring = DocumentRepository.listExpiringBy(soon).find(
+      (d) => d.motorcycleId === activeBike.id || d.motorcycleId === null,
+    );
+    const documentWarning =
+      expiring !== undefined
+        ? {
+            id: expiring.id,
+            message:
+              expiring.expiryDate !== null && expiring.expiryDate < today
+                ? `${strings.docTypes[expiring.docType as DocType]} expired`
+                : `${strings.docTypes[expiring.docType as DocType]} expires ${expiring.expiryDate ?? ''}`,
+          }
+        : undefined;
+
+    const timelineRows = loadTimeline(activeBike.id, { scope: 'all', limit: 5 });
+    const activity: ActivityVm[] = timelineRows.map((entry) => ({
+      id: entry.id,
+      kind: timelineKindToActivityKind(entry.kind),
+      icon:
+        entry.componentType !== null
+          ? componentIcon(entry.componentType)
+          : entry.kind === 'fuel'
+            ? 'fuel'
+            : entry.kind === 'repair'
+              ? 'repair'
+              : 'maintenance',
+      title: entry.title,
+      dateIso: entry.date,
+      ...(entry.odometerKm !== null ? { odometerKm: entry.odometerKm } : {}),
+      amountCentavos: entry.amountCentavos ?? 0,
+    }));
+
+    const monthKeyStr = today.slice(0, 7);
+    const categoryTotals = ExpenseRepository.categoryTotals({
+      motorcycleId: activeBike.id,
+      month: monthKeyStr,
+    });
+    const monthTotal = categoryTotals.reduce((sum, c) => sum + c.totalCentavos, 0);
+    const categories: MonthCategoryVm[] = categoryTotals.slice(0, 5).map((c, index) => ({
+      id: c.category,
+      label: strings.categories[c.category],
+      amountCentavos: c.totalCentavos,
+      slot: (CHART_SLOTS[index] ?? 'other') as MonthCategoryVm['slot'],
+    }));
+
+    const data: DashboardData = {
+      bike: {
+        id: activeBike.id,
+        nickname: activeBike.nickname,
+        brand: activeBike.brand,
+        model: activeBike.model,
+        plate: activeBike.plateNumber ?? '',
+        odometerKm: activeBike.currentOdometerKm,
+        odometerAsOf: today,
+      },
+      healthScore: score,
+      isPartialScore: health?.isPartial ?? false,
+      upcoming,
+      ...(documentWarning !== undefined ? { documentWarning } : {}),
+      activity,
+      month: {
+        label: new Date().toLocaleString('en-PH', { month: 'long' }),
+        totalCentavos: monthTotal,
+        deltaCaption: formatMoney(monthTotal),
+        categories,
+      },
+    };
+
     return {
       data,
       greeting,
       dateLabel: formatFullDate(new Date()),
       bandId,
-      bandLabel: strings.dashboard.band[bandId],
-      attentionCount: data.upcoming.filter((s) => s.status === 'dueSoon' || s.status === 'overdue')
-        .length,
+      bandLabel,
+      attentionCount: upcoming.filter((s) => s.status === 'dueSoon' || s.status === 'overdue').length,
+      hasBike: true,
     };
-  }, []);
+  }, [garageReady, activeBike, items, health]);
 }

@@ -50,6 +50,11 @@ const GLYPHS = {
   themeLight: 'white-balance-sunny',
   themeDark: 'weather-night',
   hourglass: 'timer-sand',
+  close: 'close',
+  help: 'help-circle-outline',
+  replay: 'replay',
+  lightbulb: 'lightbulb-on-outline',
+  search: 'magnify',
 } as const satisfies Record<string, GlyphName>;
 
 export type IconName = keyof typeof GLYPHS;

@@ -62,9 +62,10 @@ export interface DocumentWarningVm {
 }
 
 export interface DashboardData {
-  riderName: string;
   bike: MotorcycleVm;
-  healthScore: number;
+  /** null = no enabled anchored schedules (HEALTH_SCORE.md §5) — UI shows "—" + setup CTA. */
+  healthScore: number | null;
+  isPartialScore: boolean;
   upcoming: UpcomingScheduleVm[];
   documentWarning?: DocumentWarningVm;
   activity: ActivityVm[];
