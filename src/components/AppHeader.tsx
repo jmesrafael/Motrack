@@ -4,19 +4,16 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Icon } from '@/components/Icon';
 import { makeStyles, typeStyle } from '@/theme/styles';
 import { useTheme } from '@/theme/useTheme';
-import { TutorialAnchor } from '@/tutorial/ui/TutorialAnchor';
 
 export interface AppHeaderProps {
-  bikeLabel: string;
-  bikeA11yLabel: string;
-  onBikePress: () => void;
+  /** Screen greeting/title — quiet on purpose: the hero below owns the screen. */
+  title: string;
+  subtitle: string;
   reminderCount: number;
   remindersA11yLabel: string;
   onRemindersPress: () => void;
   /** Extra header action slot (validation phase hosts the theme switcher). */
   trailing?: ReactNode;
-  /** Registers the bike chip as a tutorial target (dashboard tour). */
-  bikeChipAnchorId?: string;
 }
 
 const useStyles = makeStyles((t) =>
@@ -26,26 +23,12 @@ const useStyles = makeStyles((t) =>
       alignItems: 'center',
       gap: t.space.s2,
     },
-    bikeChip: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: t.space.s2,
-      minHeight: 44,
-      paddingHorizontal: t.space.s3,
-      borderRadius: t.radius.full,
-      backgroundColor: t.bg.surfaceVariant,
-      flexShrink: 1,
-    },
-    bikeLabel: {
-      ...typeStyle(t.type.bodyStrong, t.text.primary),
-      flexShrink: 1,
-    },
-    chipWrap: {
-      flexShrink: 1,
-    },
-    spacer: {
+    titleBlock: {
       flex: 1,
+      gap: 2,
     },
+    title: typeStyle(t.type.h2, t.text.primary),
+    subtitle: typeStyle(t.type.caption, t.text.tertiary),
     iconButton: {
       width: 44,
       height: 44,
@@ -74,42 +57,26 @@ const useStyles = makeStyles((t) =>
 );
 
 export function AppHeader({
-  bikeLabel,
-  bikeA11yLabel,
-  onBikePress,
+  title,
+  subtitle,
   reminderCount,
   remindersA11yLabel,
   onRemindersPress,
   trailing,
-  bikeChipAnchorId,
 }: AppHeaderProps) {
   const styles = useStyles();
   const { tokens } = useTheme();
 
-  const bikeChip = (
-    <Pressable
-      onPress={onBikePress}
-      accessibilityRole="button"
-      accessibilityLabel={bikeA11yLabel}
-      style={({ pressed }) => [styles.bikeChip, pressed && { opacity: 0.7 }]}>
-      <Icon name="motorcycle" size={tokens.iconSize.listLeading} />
-      <Text style={styles.bikeLabel} numberOfLines={1}>
-        {bikeLabel}
-      </Text>
-      <Icon name="chevronDown" size={tokens.iconSize.inline} color={tokens.icon.secondary} />
-    </Pressable>
-  );
-
   return (
     <View style={styles.row}>
-      {bikeChipAnchorId !== undefined ? (
-        <TutorialAnchor id={bikeChipAnchorId} style={styles.chipWrap}>
-          {bikeChip}
-        </TutorialAnchor>
-      ) : (
-        bikeChip
-      )}
-      <View style={styles.spacer} />
+      <View style={styles.titleBlock}>
+        <Text style={styles.title} accessibilityRole="header" numberOfLines={1}>
+          {title}
+        </Text>
+        <Text style={styles.subtitle} numberOfLines={1}>
+          {subtitle}
+        </Text>
+      </View>
       {trailing}
       <Pressable
         onPress={onRemindersPress}

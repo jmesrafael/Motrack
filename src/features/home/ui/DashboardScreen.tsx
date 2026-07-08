@@ -1,5 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useCallback, useEffect } from 'react';
+import { StyleSheet, View } from 'react-native';
 
 import { AppHeader } from '@/components/AppHeader';
 import { EmptyState } from '@/components/EmptyState';
@@ -7,20 +8,20 @@ import { ListSection } from '@/components/ListSection';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { ScheduleRow } from '@/components/ScheduleRow';
 import { Screen } from '@/components/Screen';
+import { SectionHeader } from '@/components/SectionHeader';
 import { TimelineItem } from '@/components/TimelineItem';
 import { useReminderStore } from '@/stores/useReminderStore';
 import { strings } from '@/i18n/strings';
 import { formatKm, formatMoney, formatMonthDay } from '@/lib/format';
+import { makeStyles } from '@/theme/styles';
 import { TutorialAnchor } from '@/tutorial/ui/TutorialAnchor';
 import { ResumeDialog, TourOfferDialog } from '@/tutorial/ui/TutorialDialogs';
 import type { ActivityVm } from '@/types/domain';
 import { useDashboardData } from '../hooks/useDashboardData';
 import { useTourOffer } from '../hooks/useTourOffer';
+import { BikeHeroCard } from './BikeHeroCard';
 import { DocumentWarningBanner } from './DocumentWarningBanner';
-import { GreetingBlock } from './GreetingBlock';
-import { HealthHero } from './HealthHero';
 import { MonthlyStatsCard } from './MonthlyStatsCard';
-import { OdometerCard } from './OdometerCard';
 import { QuickActionsGrid } from './QuickActionsGrid';
 import { ThemeCycleButton } from './ThemeCycleButton';
 
@@ -29,8 +30,17 @@ function activityCaption(entry: ActivityVm): string {
   return entry.odometerKm === undefined ? date : `${date} · ${formatKm(entry.odometerKm)}`;
 }
 
+const useStyles = makeStyles((t) =>
+  StyleSheet.create({
+    section: {
+      gap: t.space.s2,
+    },
+  }),
+);
+
 /** S-04 Dashboard (SCREEN_SPECIFICATIONS.md) over live repository-backed data. */
 export function DashboardScreen() {
+  const styles = useStyles();
   const router = useRouter();
   const vm = useDashboardData();
   const reminderCount = useReminderStore((s) => s.items.length);
@@ -68,42 +78,48 @@ export function DashboardScreen() {
   return (
     <Screen tutorialScrollId="dashboard">
       <AppHeader
-        bikeLabel={bike.nickname}
-        bikeA11yLabel={`${bike.nickname}, ${bike.brand} ${bike.model}. ${strings.dashboard.bikeChipA11y}`}
-        onBikePress={goGarage}
+        title={vm.greeting}
+        subtitle={vm.dateLabel}
         reminderCount={reminderCount}
         remindersA11yLabel={strings.dashboard.remindersA11y}
         onRemindersPress={goReminders}
         trailing={<ThemeCycleButton />}
-        bikeChipAnchorId="dashboard.bikeChip"
       />
-      <GreetingBlock greeting={vm.greeting} dateLabel={vm.dateLabel} />
-      <TutorialAnchor id="dashboard.healthHero">
-        <HealthHero score={vm.data.healthScore} bandId={vm.bandId} bandLabel={vm.bandLabel} onPress={goMaintenance} />
-      </TutorialAnchor>
-      <TutorialAnchor id="dashboard.odometerCard">
-        <OdometerCard odometerKm={bike.odometerKm} asOfIso={bike.odometerAsOf} onUpdate={goOdometer} />
-      </TutorialAnchor>
+      <BikeHeroCard
+        bike={bike}
+        score={vm.data.healthScore}
+        bandId={vm.bandId}
+        bandLabel={vm.bandLabel}
+        onSwitchBike={goGarage}
+        onHealthPress={goMaintenance}
+        onUpdateOdometer={goOdometer}
+        bikeChipAnchorId="dashboard.bikeChip"
+        healthAnchorId="dashboard.healthHero"
+        odometerAnchorId="dashboard.odometerCard"
+      />
       {vm.data.documentWarning !== undefined ? (
         <DocumentWarningBanner
           message={vm.data.documentWarning.message}
           onPress={() => router.push('/documents')}
         />
       ) : null}
-      <ListSection title={strings.dashboard.nextMaintenance.title}>
-        {vm.data.upcoming.length === 0 ? null : (
-          vm.data.upcoming.map((schedule) => (
-            <ScheduleRow
-              key={schedule.id}
-              icon={schedule.icon}
-              label={schedule.label}
-              status={schedule.status}
-              statusLabel={strings.dashboard.nextMaintenance.due[schedule.status]}
-              remainingText={schedule.remainingText}
-              onPress={() => router.push(`/maintenance/component/${schedule.id}`)}
-            />
-          ))
-        )}
+      <ListSection
+        title={strings.dashboard.nextMaintenance.title}
+        actionLabel={strings.dashboard.nextMaintenance.seeAll}
+        onAction={goMaintenance}>
+        {vm.data.upcoming.length === 0
+          ? null
+          : vm.data.upcoming.map((schedule) => (
+              <ScheduleRow
+                key={schedule.id}
+                icon={schedule.icon}
+                label={schedule.label}
+                status={schedule.status}
+                statusLabel={strings.dashboard.nextMaintenance.due[schedule.status]}
+                remainingText={schedule.remainingText}
+                onPress={() => router.push(`/maintenance/component/${schedule.id}`)}
+              />
+            ))}
       </ListSection>
       <TutorialAnchor id="dashboard.quickActions">
         <QuickActionsGrid
@@ -133,7 +149,10 @@ export function DashboardScreen() {
           />
         ))}
       </ListSection>
-      <MonthlyStatsCard month={vm.data.month} onPress={goMoney} />
+      <View style={styles.section}>
+        <SectionHeader title={strings.dashboard.month.title} trailingLabel={vm.data.month.label} />
+        <MonthlyStatsCard month={vm.data.month} onPress={goMoney} />
+      </View>
       <TourOfferDialog
         visible={tourOffer.offerVisible}
         onStart={tourOffer.onStart}

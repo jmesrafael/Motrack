@@ -147,6 +147,9 @@ export function useDashboardData(): DashboardVm {
         label: new Date().toLocaleString('en-PH', { month: 'long' }),
         totalCentavos: monthTotal,
         deltaCaption: formatMoney(monthTotal),
+        // No month-over-month comparison yet (StatisticsService lands later);
+        // stay neutral until a prior-month total exists to compare against.
+        trend: 'flat',
         categories,
       },
     };

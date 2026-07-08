@@ -46,6 +46,8 @@ const GLYPHS = {
   statusOverdue: 'alert-circle',
   statusCritical: 'alert-octagon',
   statusNeutral: 'help-circle-outline',
+  trendUp: 'trending-up',
+  trendDown: 'trending-down',
   themeSystem: 'theme-light-dark',
   themeLight: 'white-balance-sunny',
   themeDark: 'weather-night',

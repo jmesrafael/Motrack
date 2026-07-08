@@ -53,6 +53,8 @@ export interface MonthSummaryVm {
   label: string;
   totalCentavos: number;
   deltaCaption: string;
+  /** Month-over-month direction backing the delta caption's trend glyph. */
+  trend: 'down' | 'up' | 'flat';
   categories: MonthCategoryVm[];
 }
 

@@ -41,6 +41,9 @@ const useStyles = makeStyles((t) =>
   }),
 );
 
+/** Statuses that escalate the whole row, not just the pill — overdue must be unmissable. */
+const URGENT_STATUSES: ReadonlySet<PillStatus> = new Set(['overdue', 'critical']);
+
 export function ScheduleRow({
   icon,
   label,
@@ -51,6 +54,7 @@ export function ScheduleRow({
 }: ScheduleRowProps) {
   const styles = useStyles();
   const { tokens } = useTheme();
+  const isUrgent = URGENT_STATUSES.has(status);
 
   return (
     <Pressable
@@ -58,8 +62,12 @@ export function ScheduleRow({
       accessibilityRole="button"
       accessibilityLabel={`${label}, ${statusLabel}, ${remainingText}`}
       style={({ pressed }) => [styles.row, pressed && { opacity: 0.7 }]}>
-      <View style={styles.iconWell}>
-        <Icon name={icon} size={tokens.iconSize.listLeading} />
+      <View style={[styles.iconWell, isUrgent && { backgroundColor: tokens.status[status].bg }]}>
+        <Icon
+          name={icon}
+          size={tokens.iconSize.listLeading}
+          {...(isUrgent ? { color: tokens.status[status].base } : {})}
+        />
       </View>
       <View style={styles.body}>
         <Text style={styles.label}>{label}</Text>

@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Icon, type IconName } from '@/components/Icon';
+import { SectionHeader } from '@/components/SectionHeader';
 import { strings } from '@/i18n/strings';
 import { makeStyles, typeStyle } from '@/theme/styles';
 import { useTheme } from '@/theme/useTheme';
@@ -27,10 +28,6 @@ const useStyles = makeStyles((t) =>
     section: {
       gap: t.space.s2,
     },
-    title: {
-      ...typeStyle(t.type.h2, t.text.primary),
-      paddingHorizontal: t.space.s1,
-    },
     grid: {
       flexDirection: 'row',
       gap: t.space.s3,
@@ -48,6 +45,9 @@ const useStyles = makeStyles((t) =>
       minHeight: 88,
       justifyContent: 'center',
     },
+    tilePressed: {
+      transform: [{ scale: 0.97 }],
+    },
     iconWell: {
       width: 40,
       height: 40,
@@ -56,8 +56,9 @@ const useStyles = makeStyles((t) =>
       alignItems: 'center',
       justifyContent: 'center',
     },
+    // Labels are the tap targets' names — primary ink for outdoor legibility.
     label: {
-      ...typeStyle(t.type.caption, t.text.secondary),
+      ...typeStyle(t.type.caption, t.text.primary),
       textAlign: 'center',
     },
   }),
@@ -69,9 +70,7 @@ export function QuickActionsGrid({ onAction }: QuickActionsGridProps) {
 
   return (
     <View style={styles.section}>
-      <Text style={styles.title} accessibilityRole="header">
-        {strings.dashboard.quickActions.title}
-      </Text>
+      <SectionHeader title={strings.dashboard.quickActions.title} />
       <View style={styles.grid}>
         {ACTIONS.map((action) => (
           <Pressable
@@ -79,7 +78,7 @@ export function QuickActionsGrid({ onAction }: QuickActionsGridProps) {
             onPress={() => onAction(action.id)}
             accessibilityRole="button"
             accessibilityLabel={action.label}
-            style={({ pressed }) => [styles.tile, pressed && { opacity: 0.7 }]}>
+            style={({ pressed }) => [styles.tile, pressed && styles.tilePressed]}>
             <View style={styles.iconWell}>
               <Icon
                 name={action.icon}

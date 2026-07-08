@@ -1,6 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import Svg, { Line, Path } from 'react-native-svg';
+import Animated, {
+  Easing,
+  useAnimatedProps,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
+import Svg, { Path } from 'react-native-svg';
 
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { makeStyles, typeStyle } from '@/theme/styles';
@@ -15,13 +21,16 @@ export interface HealthRingProps {
   colorBg: string;
   scoreSuffix: string;
   size?: number;
-  accessibilityLabel: string;
 }
 
 // Gauge geometry: 270° sweep opening at the bottom — instrument-cluster feel.
+// Purely visual: the parent surface must carry the accessibility label
+// ("Health score 87, Good" — SCREEN_SPECIFICATIONS.md S-04 a11y).
 const SWEEP_DEG = 270;
 const START_DEG = 225;
-const TICK_COUNT = 28;
+const STROKE_WIDTH = 14;
+
+const AnimatedPath = Animated.createAnimatedComponent(Path);
 
 function polarPoint(center: number, radius: number, angleDeg: number) {
   const rad = ((angleDeg - 90) * Math.PI) / 180;
@@ -83,84 +92,56 @@ export function HealthRing({
   color,
   colorBg,
   scoreSuffix,
-  size = 220,
-  accessibilityLabel,
+  size = 184,
 }: HealthRingProps) {
   const styles = useStyles();
   const { tokens } = useTheme();
   const isReducedMotion = useReducedMotion();
 
   const target = score === null ? 0 : Math.max(0, Math.min(100, score)) / 100;
-  const [progress, setProgress] = useState(0);
-
-  // Sweep-in on appear/score change (motion.slow); instant under reduced motion.
-  useEffect(() => {
-    if (isReducedMotion) {
-      setProgress(target);
-      return;
-    }
-    let frame = 0;
-    const durationMs = tokens.motion.slow.durationMs;
-    const startedAt = Date.now();
-    const tick = () => {
-      const elapsed = Date.now() - startedAt;
-      const linear = Math.min(1, elapsed / durationMs);
-      const eased = 1 - (1 - linear) ** 3;
-      setProgress(target * eased);
-      if (linear < 1) {
-        frame = requestAnimationFrame(tick);
-      }
-    };
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  }, [target, isReducedMotion, tokens.motion.slow.durationMs]);
 
   const center = size / 2;
-  const trackRadius = center - 16;
-  const strokeWidth = 12;
-  const tickOuter = center - 1;
-  const tickInner = center - 7;
+  const radius = center - STROKE_WIDTH / 2 - 1;
+  const arcLength = 2 * Math.PI * radius * (SWEEP_DEG / 360);
+  const fullArc = arcPath(center, radius, START_DEG, SWEEP_DEG);
 
-  const ticks = Array.from({ length: TICK_COUNT }, (_, i) => {
-    const angle = START_DEG + (SWEEP_DEG / (TICK_COUNT - 1)) * i;
-    const outer = polarPoint(center, tickOuter, angle);
-    const inner = polarPoint(center, tickInner, angle);
-    return { key: i, x1: inner.x, y1: inner.y, x2: outer.x, y2: outer.y };
-  });
+  // Sweep to value on appear/score change (motion.slow) — native driver via
+  // animated dashoffset, never a JS frame loop (ANIMATION_GUIDE.md §1.3/§3).
+  const progress = useSharedValue(0);
+  useEffect(() => {
+    if (isReducedMotion) {
+      progress.value = target;
+      return;
+    }
+    progress.value = withTiming(target, {
+      duration: tokens.motion.slow.durationMs,
+      easing: Easing.out(Easing.cubic),
+    });
+  }, [target, isReducedMotion, progress, tokens.motion.slow.durationMs]);
+
+  const animatedProps = useAnimatedProps(() => ({
+    strokeDashoffset: arcLength * (1 - progress.value),
+  }));
 
   return (
-    <View
-      style={[styles.root, { width: size, height: size }]}
-      accessible
-      accessibilityRole="image"
-      accessibilityLabel={accessibilityLabel}>
+    <View style={[styles.root, { width: size, height: size }]}>
       <Svg width={size} height={size}>
-        {ticks.map((tickLine) => (
-          <Line
-            key={tickLine.key}
-            x1={tickLine.x1}
-            y1={tickLine.y1}
-            x2={tickLine.x2}
-            y2={tickLine.y2}
-            stroke={tokens.border.divider}
-            strokeWidth={2}
-            strokeLinecap="round"
-          />
-        ))}
         <Path
-          d={arcPath(center, trackRadius, START_DEG, SWEEP_DEG)}
+          d={fullArc}
           stroke={tokens.bg.surfaceVariant}
-          strokeWidth={strokeWidth}
+          strokeWidth={STROKE_WIDTH}
           strokeLinecap="round"
           fill="none"
         />
-        {progress > 0 ? (
-          <Path
-            d={arcPath(center, trackRadius, START_DEG, Math.max(1, SWEEP_DEG * progress))}
+        {score !== null ? (
+          <AnimatedPath
+            d={fullArc}
             stroke={color}
-            strokeWidth={strokeWidth}
+            strokeWidth={STROKE_WIDTH}
             strokeLinecap="round"
             fill="none"
+            strokeDasharray={`${arcLength} ${arcLength}`}
+            animatedProps={animatedProps}
           />
         ) : null}
       </Svg>

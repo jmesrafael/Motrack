@@ -3,6 +3,7 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { makeStyles } from '@/theme/styles';
+import { useTheme } from '@/theme/useTheme';
 import { registerScroll, unregisterScroll } from '@/tutorial/anchors';
 import { TutorialScrollContext } from '@/tutorial/ui/scrollContext';
 
@@ -23,10 +24,12 @@ const useStyles = makeStyles((t) =>
       flex: 1,
       backgroundColor: t.bg.page,
     },
+    // s5 section rhythm: enough air for sections to read as groups without
+    // pushing "Next maintenance" below the fold on small screens.
     content: {
       paddingHorizontal: t.space.s4,
-      paddingBottom: t.space.s6,
-      gap: t.space.s4,
+      paddingBottom: t.space.s8,
+      gap: t.space.s5,
     },
     fixed: {
       flex: 1,
@@ -37,7 +40,9 @@ const useStyles = makeStyles((t) =>
 
 export function Screen({ children, scroll = true, tutorialScrollId }: ScreenProps) {
   const styles = useStyles();
+  const { tokens } = useTheme();
   const insets = useSafeAreaInsets();
+  const topPadding = insets.top + tokens.space.s2;
   const scrollRef = useRef<ScrollView | null>(null);
 
   useEffect(() => {
@@ -51,7 +56,7 @@ export function Screen({ children, scroll = true, tutorialScrollId }: ScreenProp
   if (!scroll) {
     return (
       <View style={styles.root}>
-        <View style={[styles.fixed, { paddingTop: insets.top }]}>{children}</View>
+        <View style={[styles.fixed, { paddingTop: topPadding }]}>{children}</View>
       </View>
     );
   }
@@ -59,7 +64,7 @@ export function Screen({ children, scroll = true, tutorialScrollId }: ScreenProp
   const content = (
     <ScrollView
       ref={scrollRef}
-      contentContainerStyle={[styles.content, { paddingTop: insets.top }]}
+      contentContainerStyle={[styles.content, { paddingTop: topPadding }]}
       showsVerticalScrollIndicator={false}>
       {children}
     </ScrollView>
