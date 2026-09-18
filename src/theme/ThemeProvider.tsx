@@ -4,7 +4,6 @@ import { Animated, StyleSheet, useColorScheme } from 'react-native';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useSettingsStore } from '@/stores/useSettingsStore';
 import { THEMES, isThemeId, type ThemeId, type ThemePreference } from './registry';
-import { consumeSkipNextThemeFade } from './themeTransition';
 import type { ThemeBase, ThemeTokens } from './types';
 
 export interface ThemeContextValue {
@@ -55,20 +54,15 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   useEffect(() => {
     const previous = previousRef.current;
     if (previous.themeId !== themeId) {
-      // The web circular-reveal toggle already animates this exact swap —
-      // skip our own fade so the two transitions don't run at once.
-      const skipFade = consumeSkipNextThemeFade();
       setOverlayColor(previous.pageColor);
       previousRef.current = { themeId, pageColor: definition.tokens.bg.page };
-      if (!isReducedMotion && !skipFade) {
+      if (!isReducedMotion) {
         fadeOpacity.setValue(1);
         Animated.timing(fadeOpacity, {
           toValue: 0,
           duration: definition.tokens.motion.slow.durationMs,
           useNativeDriver: false,
         }).start();
-      } else {
-        fadeOpacity.setValue(0);
       }
     }
   }, [themeId, definition, fadeOpacity, isReducedMotion]);
