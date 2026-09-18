@@ -20,14 +20,14 @@ const useStyles = makeStyles((t) =>
       alignItems: 'center',
       gap: t.space.s2,
     },
-    label: typeStyle(t.type.caption, t.text.secondary),
+    label: typeStyle(t.type.caption, t.text.secondary, t.type.family),
     value: {
-      ...typeStyle(t.type.h1, t.text.primary),
+      ...typeStyle(t.type.h1, t.text.primary, t.type.family),
       fontVariant: ['tabular-nums'],
       marginTop: t.space.s1,
     },
     caption: {
-      ...typeStyle(t.type.caption, t.text.tertiary),
+      ...typeStyle(t.type.caption, t.text.tertiary, t.type.family),
       marginTop: 2,
     },
   }),
@@ -42,9 +42,7 @@ export function StatCard({ label, value, caption, icon, onPress }: StatCardProps
       {...(onPress !== undefined ? { onPress } : {})}
       accessibilityLabel={`${label}: ${value}${caption !== undefined ? `, ${caption}` : ''}`}>
       <View style={styles.header}>
-        {icon !== undefined ? (
-          <Icon name={icon} size={tokens.iconSize.inline} color={tokens.icon.secondary} />
-        ) : null}
+        {icon !== undefined ? <Icon name={icon} size={tokens.iconSize.inline} color={tokens.primary.text} /> : null}
         <Text style={styles.label}>{label}</Text>
       </View>
       <Text style={styles.value}>{value}</Text>

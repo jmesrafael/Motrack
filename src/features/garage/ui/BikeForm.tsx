@@ -7,7 +7,7 @@ import { MoneyInput } from '@/components/MoneyInput';
 import { OdoInput } from '@/components/OdoInput';
 import { PickerField } from '@/components/PickerField';
 import { PrimaryButton } from '@/components/PrimaryButton';
-import { SegmentedControl } from '@/components/SegmentedControl';
+import { SegmentedControl, type Segment } from '@/components/SegmentedControl';
 import { TextField } from '@/components/TextField';
 import type { MotorcycleRow } from '@/db/schema';
 import { todayIso } from '@/lib/dates';
@@ -30,6 +30,24 @@ const DRIVETRAIN_OPTIONS = DRIVETRAIN_TYPES.map((d) => ({
   value: d,
   label: d === 'cvt' ? 'Automatic / scooter' : d === 'chain' ? 'Manual / chain' : 'Other',
 }));
+
+type TabKey = 'basics' | 'details';
+
+const TABS: readonly Segment<TabKey>[] = [
+  { value: 'basics', label: 'Basics' },
+  { value: 'details', label: 'Details' },
+];
+
+/** Fields shown on the Details tab; anything else lives on Basics. */
+const DETAILS_FIELDS = new Set<keyof BikeFormValues>([
+  'currentOdometerKm',
+  'year',
+  'plateNumber',
+  'vin',
+  'engineNumber',
+  'purchaseDate',
+  'purchasePrice',
+]);
 
 export interface BikeFormValues {
   nickname: string;
@@ -78,68 +96,107 @@ function initialValues(bike?: MotorcycleRow): BikeFormValues {
 export function BikeForm({ initial, fieldErrors, submitLabel, submitting, onSubmit }: BikeFormProps) {
   const styles = useStyles();
   const [values, setValues] = useState<BikeFormValues>(() => initialValues(initial));
+  const [tab, setTab] = useState<TabKey>('basics');
+  const [lastFieldErrors, setLastFieldErrors] = useState(fieldErrors);
 
   const set = <K extends keyof BikeFormValues>(key: K, value: BikeFormValues[K]) =>
     setValues((v) => ({ ...v, [key]: value }));
 
+  // Jump to whichever tab holds the error so a failed submit is never silently on the other tab.
+  if (fieldErrors !== lastFieldErrors) {
+    setLastFieldErrors(fieldErrors);
+    if (fieldErrors !== undefined) {
+      const errorKeys = Object.keys(fieldErrors) as (keyof BikeFormValues)[];
+      if (errorKeys.some((key) => !DETAILS_FIELDS.has(key))) {
+        setTab('basics');
+      } else if (errorKeys.some((key) => DETAILS_FIELDS.has(key))) {
+        setTab('details');
+      }
+    }
+  }
+
   return (
     <View style={styles.root}>
-      <FormField label="Nickname" required error={fieldErrors?.nickname}>
-        <TextField
-          value={values.nickname}
-          onChangeText={(v) => set('nickname', v)}
-          maxLength={30}
-          placeholder="Daily NMAX"
-        />
-      </FormField>
-      <FormField label="Brand" required error={fieldErrors?.brand}>
-        <PickerField
-          options={BRAND_OPTIONS}
-          value={values.brand}
-          onChange={(v) => set('brand', v)}
-          placeholder="Select brand"
-        />
-      </FormField>
-      <FormField label="Model" required error={fieldErrors?.model}>
-        <TextField value={values.model} onChangeText={(v) => set('model', v)} maxLength={40} placeholder="NMAX 155" />
-      </FormField>
-      <FormField label="Drivetrain" required error={fieldErrors?.drivetrainType}>
-        <SegmentedControl segments={DRIVETRAIN_OPTIONS} value={values.drivetrainType} onChange={(v) => set('drivetrainType', v)} />
-      </FormField>
-      {initial === undefined ? (
-        <FormField label="Current odometer (km)" required error={fieldErrors?.currentOdometerKm}>
-          <OdoInput value={values.currentOdometerKm} onChange={(v) => set('currentOdometerKm', v)} />
-        </FormField>
-      ) : null}
-      <FormField label="Year" error={fieldErrors?.year}>
-        <TextField
-          value={values.year}
-          onChangeText={(v) => set('year', v.replace(/[^0-9]/g, ''))}
-          keyboardType="number-pad"
-          maxLength={4}
-          placeholder={String(new Date().getFullYear())}
-        />
-      </FormField>
-      <FormField label="Plate number" error={fieldErrors?.plateNumber}>
-        <TextField
-          value={values.plateNumber}
-          onChangeText={(v) => set('plateNumber', v.toUpperCase())}
-          maxLength={8}
-          autoCapitalize="characters"
-        />
-      </FormField>
-      <FormField label="VIN" error={fieldErrors?.vin}>
-        <TextField value={values.vin} onChangeText={(v) => set('vin', v)} maxLength={20} />
-      </FormField>
-      <FormField label="Engine number" error={fieldErrors?.engineNumber}>
-        <TextField value={values.engineNumber} onChangeText={(v) => set('engineNumber', v)} maxLength={20} />
-      </FormField>
-      <FormField label="Purchase date" error={fieldErrors?.purchaseDate}>
-        <DateField value={values.purchaseDate ?? todayIso()} onChange={(v) => set('purchaseDate', v)} maxIso={todayIso()} />
-      </FormField>
-      <FormField label="Purchase price" error={fieldErrors?.purchasePrice}>
-        <MoneyInput value={values.purchasePrice} onChange={(v) => set('purchasePrice', v)} />
-      </FormField>
+      <SegmentedControl segments={TABS} value={tab} onChange={setTab} />
+      {tab === 'basics' ? (
+        <>
+          <FormField label="Nickname" required error={fieldErrors?.nickname}>
+            <TextField
+              value={values.nickname}
+              onChangeText={(v) => set('nickname', v)}
+              maxLength={30}
+              placeholder="Daily NMAX"
+            />
+          </FormField>
+          <FormField label="Brand" required error={fieldErrors?.brand}>
+            <PickerField
+              options={BRAND_OPTIONS}
+              value={values.brand}
+              onChange={(v) => set('brand', v)}
+              placeholder="Select brand"
+            />
+          </FormField>
+          <FormField label="Model" required error={fieldErrors?.model}>
+            <TextField
+              value={values.model}
+              onChangeText={(v) => set('model', v)}
+              maxLength={40}
+              placeholder="NMAX 155"
+            />
+          </FormField>
+          <FormField label="Drivetrain" required error={fieldErrors?.drivetrainType}>
+            <SegmentedControl
+              segments={DRIVETRAIN_OPTIONS}
+              value={values.drivetrainType}
+              onChange={(v) => set('drivetrainType', v)}
+            />
+          </FormField>
+        </>
+      ) : (
+        <>
+          {initial === undefined ? (
+            <FormField
+              label="Current odometer (km)"
+              error={fieldErrors?.currentOdometerKm}
+              hint="Optional, but it lets Motrack track wear from day one and alert you when things like an oil change are coming up.">
+              <OdoInput value={values.currentOdometerKm} onChange={(v) => set('currentOdometerKm', v)} />
+            </FormField>
+          ) : null}
+          <FormField label="Year" error={fieldErrors?.year}>
+            <TextField
+              value={values.year}
+              onChangeText={(v) => set('year', v.replace(/[^0-9]/g, ''))}
+              keyboardType="number-pad"
+              maxLength={4}
+              placeholder={String(new Date().getFullYear())}
+            />
+          </FormField>
+          <FormField label="Plate number" error={fieldErrors?.plateNumber}>
+            <TextField
+              value={values.plateNumber}
+              onChangeText={(v) => set('plateNumber', v.toUpperCase())}
+              maxLength={8}
+              autoCapitalize="characters"
+            />
+          </FormField>
+          <FormField label="VIN" error={fieldErrors?.vin}>
+            <TextField value={values.vin} onChangeText={(v) => set('vin', v)} maxLength={20} />
+          </FormField>
+          <FormField label="Engine number" error={fieldErrors?.engineNumber}>
+            <TextField value={values.engineNumber} onChangeText={(v) => set('engineNumber', v)} maxLength={20} />
+          </FormField>
+          <FormField label="Purchase date" error={fieldErrors?.purchaseDate}>
+            <DateField
+              value={values.purchaseDate ?? todayIso()}
+              onChange={(v) => set('purchaseDate', v)}
+              maxIso={todayIso()}
+            />
+          </FormField>
+          <FormField label="Purchase price" error={fieldErrors?.purchasePrice}>
+            <MoneyInput value={values.purchasePrice} onChange={(v) => set('purchasePrice', v)} />
+          </FormField>
+        </>
+      )}
       <PrimaryButton label={submitLabel} loading={submitting} onPress={() => onSubmit(values)} />
     </View>
   );

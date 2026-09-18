@@ -6,9 +6,11 @@ import { Card } from '@/components/Card';
 import { OdoInput } from '@/components/OdoInput';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { Screen } from '@/components/Screen';
+import { ScreenHeader } from '@/components/ScreenHeader';
 import { SecondaryButton } from '@/components/SecondaryButton';
 import { StatusPill } from '@/components/StatusPill';
 import { TimelineItem } from '@/components/TimelineItem';
+import { showToast } from '@/components/Toast';
 import { MaintenanceRepository } from '@/db/repositories/MaintenanceRepository';
 import { MotorcycleRepository } from '@/db/repositories/MotorcycleRepository';
 import { ScheduleRepository } from '@/db/repositories/ScheduleRepository';
@@ -63,7 +65,7 @@ export default function ComponentDetailRoute() {
   if (schedule === undefined || bike === undefined || status === null) {
     return (
       <Screen>
-        <Text style={styles.title}>Not found</Text>
+        <ScreenHeader title="Not found" />
       </Screen>
     );
   }
@@ -79,12 +81,13 @@ export default function ComponentDetailRoute() {
     });
     if (result.ok) {
       setRefreshKey((k) => k + 1);
+      showToast('Baseline saved');
     }
   };
 
   return (
     <Screen>
-      <Text style={styles.title}>{label}</Text>
+      <ScreenHeader title={label} />
       <Card>
         <View style={styles.row}>
           <StatusPill status={status.status} label={strings.dashboard.nextMaintenance.due[status.status]} />
@@ -114,6 +117,7 @@ export default function ComponentDetailRoute() {
               });
               if (result.ok) {
                 setRefreshKey((k) => k + 1);
+                showToast('Baseline saved');
               }
             }}
           />

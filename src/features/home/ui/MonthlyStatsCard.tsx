@@ -19,15 +19,15 @@ const useStyles = makeStyles((t) =>
       alignItems: 'baseline',
       justifyContent: 'space-between',
     },
-    title: typeStyle(t.type.caption, t.text.secondary),
-    monthLabel: typeStyle(t.type.caption, t.text.tertiary),
+    title: typeStyle(t.type.caption, t.text.secondary, t.type.family),
+    monthLabel: typeStyle(t.type.caption, t.text.tertiary, t.type.family),
     total: {
-      ...typeStyle(t.type.h1, t.text.primary),
+      ...typeStyle(t.type.h1, t.text.primary, t.type.family),
       fontVariant: ['tabular-nums'],
       marginTop: t.space.s1,
     },
     delta: {
-      ...typeStyle(t.type.caption, t.text.tertiary),
+      ...typeStyle(t.type.caption, t.text.tertiary, t.type.family),
       marginTop: 2,
     },
     // Stacked category bar with 2px surface gaps (chart standards, DESIGN_SYSTEM.md §3).
@@ -57,11 +57,11 @@ const useStyles = makeStyles((t) =>
       borderRadius: t.radius.full,
     },
     legendLabel: {
-      ...typeStyle(t.type.caption, t.text.secondary),
+      ...typeStyle(t.type.caption, t.text.secondary, t.type.family),
       flex: 1,
     },
     legendValue: {
-      ...typeStyle(t.type.caption, t.text.primary),
+      ...typeStyle(t.type.caption, t.text.primary, t.type.family),
       fontVariant: ['tabular-nums'],
     },
   }),

@@ -5,6 +5,7 @@ import { StyleSheet, Text } from 'react-native';
 import { EmptyState } from '@/components/EmptyState';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { Screen } from '@/components/Screen';
+import { ScreenHeader } from '@/components/ScreenHeader';
 import { TimelineItem } from '@/components/TimelineItem';
 import { MotorcycleRepository } from '@/db/repositories/MotorcycleRepository';
 import { todayIso, addDays } from '@/lib/dates';
@@ -15,8 +16,7 @@ import { useFeatureTip } from '@/tutorial/hooks/useFeatureTip';
 
 const useStyles = makeStyles((t) =>
   StyleSheet.create({
-    title: typeStyle(t.type.h1, t.text.primary),
-    sectionTitle: { ...typeStyle(t.type.h2, t.text.primary), marginTop: t.space.s4 },
+    sectionTitle: { ...typeStyle(t.type.h2, t.text.primary), marginTop: t.space.s4, paddingHorizontal: t.space.s1 },
   }),
 );
 
@@ -38,8 +38,14 @@ export default function DocumentsRoute() {
   if (documents.length === 0) {
     return (
       <Screen scroll={false}>
-        <EmptyState icon="documents" title="Keep OR/CR, insurance, receipts safe" body="Add your first document." />
-        <PrimaryButton label="Add document" onPress={() => router.push('/documents/new')} />
+        <ScreenHeader title="Documents" />
+        <EmptyState
+          icon="shield"
+          title="Keep OR/CR, insurance, receipts safe"
+          body="Add your first document and Motrack will warn you before it expires."
+          ctaLabel="Add document"
+          onCtaPress={() => router.push('/documents/new')}
+        />
       </Screen>
     );
   }
@@ -57,8 +63,8 @@ export default function DocumentsRoute() {
 
   return (
     <Screen>
-      <Text style={styles.title}>Documents</Text>
-      <PrimaryButton label="+ Add document" onPress={() => router.push('/documents/new')} />
+      <ScreenHeader title="Documents" />
+      <PrimaryButton label="Add document" icon="plus" onPress={() => router.push('/documents/new')} />
       {[...groups.entries()].map(([groupLabel, docs]) => (
         <>
           <Text style={styles.sectionTitle} key={`${groupLabel}-title`}>

@@ -2,10 +2,13 @@ import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { Card } from '@/components/Card';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { OdoInput } from '@/components/OdoInput';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { Screen } from '@/components/Screen';
+import { ScreenHeader } from '@/components/ScreenHeader';
 import { SecondaryButton } from '@/components/SecondaryButton';
+import { showToast } from '@/components/Toast';
 import { OdometerRepository } from '@/db/repositories/OdometerRepository';
 import { useActiveBike } from '@/hooks/useActiveBike';
 import { formatMonthDay } from '@/lib/format';
@@ -30,6 +33,7 @@ export default function OdometerLogListRoute() {
   const [editValue, setEditValue] = useState('');
   const [refreshKey, setRefreshKey] = useState(0);
   const [error, setError] = useState<string>();
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   if (activeBike === null) {
     return (
@@ -51,16 +55,21 @@ export default function OdometerLogListRoute() {
     setError(undefined);
     setEditingId(null);
     setRefreshKey((k) => k + 1);
+    showToast('Odometer entry updated');
   };
 
-  const handleDelete = (id: string) => {
-    OdometerService.deleteReading(id);
-    setRefreshKey((k) => k + 1);
+  const handleDelete = () => {
+    if (deletingId !== null) {
+      OdometerService.deleteReading(deletingId);
+      setDeletingId(null);
+      setRefreshKey((k) => k + 1);
+      showToast({ kind: 'info', message: 'Entry deleted' });
+    }
   };
 
   return (
     <Screen>
-      <Text style={styles.title}>Odometer entries</Text>
+      <ScreenHeader title="Odometer entries" />
       {error !== undefined ? <Text style={styles.caption}>{error}</Text> : null}
       {logs.map((log) => (
         <Card key={log.id}>
@@ -85,11 +94,19 @@ export default function OdometerLogListRoute() {
             <View style={styles.editRow}>
               <OdoInput value={editValue} onChange={setEditValue} />
               <PrimaryButton label="Save" onPress={() => handleSaveEdit(log.id)} />
-              <SecondaryButton label="Delete" onPress={() => handleDelete(log.id)} />
+              <SecondaryButton label="Delete" onPress={() => setDeletingId(log.id)} />
             </View>
           ) : null}
         </Card>
       ))}
+      <ConfirmDialog
+        visible={deletingId !== null}
+        title="Delete this entry?"
+        body="This removes the odometer reading and may affect distance-based calculations around it."
+        confirmLabel="Delete entry"
+        onConfirm={handleDelete}
+        onCancel={() => setDeletingId(null)}
+      />
     </Screen>
   );
 }

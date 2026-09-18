@@ -211,12 +211,12 @@ export function TutorialTooltip({
       ]}>
       {placement.arrowX !== null ? (
         <View
-          pointerEvents="none"
           style={[
             styles.arrow,
             placement.side === 'below'
               ? { top: -ARROW_SIZE / 2, left: placement.arrowX - ARROW_SIZE / 2 }
               : { bottom: -ARROW_SIZE / 2, left: placement.arrowX - ARROW_SIZE / 2 },
+            { pointerEvents: 'none' },
           ]}
         />
       ) : null}

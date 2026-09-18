@@ -2,13 +2,17 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Text } from 'react-native';
 
+import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { DateField } from '@/components/DateField';
+import { DestructiveButton } from '@/components/DestructiveButton';
 import { FormField } from '@/components/FormField';
 import { MoneyInput } from '@/components/MoneyInput';
 import { OdoInput } from '@/components/OdoInput';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { Screen } from '@/components/Screen';
+import { ScreenHeader } from '@/components/ScreenHeader';
 import { TextField } from '@/components/TextField';
+import { showToast } from '@/components/Toast';
 import { RepairRepository } from '@/db/repositories/RepairRepository';
 import { useActiveBike } from '@/hooks/useActiveBike';
 import { todayIso } from '@/lib/dates';
@@ -38,6 +42,7 @@ export default function RepairLogRoute() {
   const [notes, setNotes] = useState(existing?.notes ?? '');
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>();
   const [error, setError] = useState<string>();
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
 
   const bikeId = existing?.motorcycleId ?? activeBike?.id ?? null;
   if (bikeId === null) {
@@ -66,12 +71,22 @@ export default function RepairLogRoute() {
       setError(result.error.message);
       return;
     }
+    showToast(existing !== undefined ? 'Repair updated' : 'Repair saved');
     router.back();
+  };
+
+  const handleDelete = () => {
+    setConfirmingDelete(false);
+    if (existing !== undefined) {
+      RepairService.deleteRepair(existing.id);
+      showToast({ kind: 'info', message: 'Repair deleted' });
+      router.back();
+    }
   };
 
   return (
     <Screen>
-      <Text style={styles.title}>{existing !== undefined ? 'Edit repair' : 'Log repair'}</Text>
+      <ScreenHeader title={existing !== undefined ? 'Edit repair' : 'Log repair'} />
       {error !== undefined ? <Text style={styles.error}>{error}</Text> : null}
       <FormField label="Title" required error={fieldErrors?.title}>
         <TextField value={title} onChangeText={setTitle} maxLength={60} placeholder="Brake lever adjustment" />
@@ -98,6 +113,17 @@ export default function RepairLogRoute() {
         <TextField value={notes} onChangeText={setNotes} multiline maxLength={500} />
       </FormField>
       <PrimaryButton label={existing !== undefined ? 'Save changes' : 'Save'} onPress={handleSubmit} />
+      {existing !== undefined ? (
+        <DestructiveButton label="Delete repair" onPress={() => setConfirmingDelete(true)} />
+      ) : null}
+      <ConfirmDialog
+        visible={confirmingDelete}
+        title="Delete this repair?"
+        body="This removes it from your repair history. Recoverable for 30 days."
+        confirmLabel="Delete repair"
+        onConfirm={handleDelete}
+        onCancel={() => setConfirmingDelete(false)}
+      />
     </Screen>
   );
 }

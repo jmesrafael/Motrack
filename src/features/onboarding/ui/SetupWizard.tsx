@@ -6,10 +6,12 @@ import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { DateField } from '@/components/DateField';
 import { FormField } from '@/components/FormField';
 import { Icon } from '@/components/Icon';
+import { IconButton } from '@/components/IconButton';
 import { OdoInput } from '@/components/OdoInput';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { Screen } from '@/components/Screen';
 import { SecondaryButton } from '@/components/SecondaryButton';
+import { showToast } from '@/components/Toast';
 import { Toggle } from '@/components/Toggle';
 import { ScheduleRepository } from '@/db/repositories/ScheduleRepository';
 import type { MotorcycleRow } from '@/db/schema';
@@ -51,12 +53,17 @@ const useStyles = makeStyles((t) =>
     headerText: { flex: 1, gap: 2 },
     title: typeStyle(t.type.h1, t.text.primary),
     progress: typeStyle(t.type.caption, t.text.secondary),
-    closeButton: {
-      width: 44,
-      height: 44,
-      borderRadius: t.radius.full,
-      alignItems: 'center',
-      justifyContent: 'center',
+    progressTrack: {
+      height: 4,
+      borderRadius: 2,
+      backgroundColor: t.bg.surfaceVariant,
+      marginTop: t.space.s1,
+      overflow: 'hidden',
+    },
+    progressFill: {
+      height: 4,
+      borderRadius: 2,
+      backgroundColor: t.primary.base,
     },
     stepTitle: typeStyle(t.type.h2, t.text.primary),
     stepBody: typeStyle(t.type.body, t.text.secondary),
@@ -255,14 +262,21 @@ export function SetupWizard() {
               total: stepOrder.length,
             })}
           </Text>
+          <View style={styles.progressTrack}>
+            <View
+              style={[
+                styles.progressFill,
+                { width: `${((stepIndex + 1) / stepOrder.length) * 100}%` },
+              ]}
+            />
+          </View>
         </View>
-        <Pressable
+        <IconButton
+          icon="close"
           onPress={() => setConfirmingExit(true)}
-          accessibilityRole="button"
           accessibilityLabel={strings.onboarding.setup.closeA11y}
-          style={({ pressed }) => [styles.closeButton, pressed && { opacity: 0.7 }]}>
-          <Icon name="close" size={tokens.iconSize.md} color={tokens.icon.secondary} />
-        </Pressable>
+          variant="ghost"
+        />
       </View>
 
       {step === 'bike' ? (
@@ -334,7 +348,10 @@ export function SetupWizard() {
           <Text style={styles.stepBody}>{strings.onboarding.setup.done.body}</Text>
           <PrimaryButton
             label={strings.onboarding.setup.done.cta}
-            onPress={() => finish('completed')}
+            onPress={() => {
+              showToast('Motorcycle set up');
+              finish('completed');
+            }}
           />
         </View>
       ) : null}
@@ -358,6 +375,7 @@ export function SetupWizard() {
         title={strings.onboarding.setup.exitTitle}
         body={strings.onboarding.setup.exitBody}
         confirmLabel={strings.onboarding.setup.exitConfirm}
+        destructive={false}
         onConfirm={exitEarly}
         onCancel={() => setConfirmingExit(false)}
       />

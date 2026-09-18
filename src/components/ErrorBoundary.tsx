@@ -1,9 +1,11 @@
 import { Component, type ReactNode } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { SecondaryButton } from '@/components/SecondaryButton';
+import { Icon } from '@/components/Icon';
+import { PrimaryButton } from '@/components/PrimaryButton';
 import { log } from '@/lib/log';
 import { makeStyles, typeStyle } from '@/theme/styles';
+import { useTheme } from '@/theme/useTheme';
 
 interface Props {
   children: ReactNode;
@@ -23,18 +25,37 @@ const useStyles = makeStyles((t) =>
       padding: t.space.s6,
       backgroundColor: t.bg.page,
     },
-    title: typeStyle(t.type.h1, t.text.primary),
-    body: { ...typeStyle(t.type.body, t.text.secondary), textAlign: 'center' },
+    iconWell: {
+      width: 84,
+      height: 84,
+      borderRadius: t.radius.xl,
+      backgroundColor: t.feedback.warning.bg,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: t.space.s2,
+    },
+    title: { ...typeStyle(t.type.h1, t.text.primary, t.type.family), textAlign: 'center' },
+    body: { ...typeStyle(t.type.body, t.text.secondary, t.type.family), textAlign: 'center', maxWidth: 320 },
+    // Same centered container as title/body (maxWidth 320, centered by root's
+    // alignItems) instead of alignSelf:'stretch', which ignored that centering
+    // and pinned the button to root's full, unconstrained edge-to-edge width.
+    cta: { alignSelf: 'center', width: '100%', maxWidth: 320, marginTop: t.space.s2 },
   }),
 );
 
 function Fallback({ onRestart }: { onRestart: () => void }) {
   const styles = useStyles();
+  const { tokens } = useTheme();
   return (
     <View style={styles.root}>
+      <View style={styles.iconWell}>
+        <Icon name="statusDueSoon" size={tokens.iconSize.feature} color={tokens.feedback.warning.base} />
+      </View>
       <Text style={styles.title}>Something broke</Text>
       <Text style={styles.body}>Your data is safe. Try restarting this screen.</Text>
-      <SecondaryButton label="Restart" onPress={onRestart} />
+      <View style={styles.cta}>
+        <PrimaryButton label="Restart" onPress={onRestart} />
+      </View>
     </View>
   );
 }

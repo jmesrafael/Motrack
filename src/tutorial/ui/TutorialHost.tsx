@@ -68,7 +68,7 @@ function ActiveTutorialLayer({ reduceMotion }: { reduceMotion: boolean }) {
     step !== undefined && step.advance.type !== 'next' && step.advance.type !== 'delay';
 
   return (
-    <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
+    <View style={[StyleSheet.absoluteFill, { pointerEvents: 'box-none' }]}>
       <SpotlightOverlay
         rect={showing ? targetRect : null}
         shape={targetShape}

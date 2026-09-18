@@ -1,6 +1,7 @@
-import { Pressable, StyleSheet, Text } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 
 import { Icon } from '@/components/Icon';
+import { PressableScale } from '@/components/PressableScale';
 import { makeStyles, typeStyle } from '@/theme/styles';
 import { useTheme } from '@/theme/useTheme';
 
@@ -19,10 +20,10 @@ const useStyles = makeStyles((t) =>
       borderRadius: t.radius.md,
       paddingHorizontal: t.space.s4,
       paddingVertical: t.space.s3,
-      minHeight: 44,
+      minHeight: t.size.buttonMd,
     },
     message: {
-      ...typeStyle(t.type.bodyStrong, t.text.primary),
+      ...typeStyle(t.type.bodyStrong, t.text.primary, t.type.family),
       flex: 1,
     },
   }),
@@ -33,14 +34,16 @@ export function DocumentWarningBanner({ message, onPress }: DocumentWarningBanne
   const { tokens } = useTheme();
 
   return (
-    <Pressable
+    <PressableScale
       onPress={onPress}
+      dim
+      scaleTo={0.99}
       accessibilityRole="button"
       accessibilityLabel={message}
-      style={({ pressed }) => [styles.banner, pressed && { opacity: 0.7 }]}>
+      style={styles.banner}>
       <Icon name="documents" size={tokens.iconSize.listLeading} color={tokens.notif.warning} />
       <Text style={styles.message}>{message}</Text>
       <Icon name="chevronRight" size={tokens.iconSize.inline} color={tokens.icon.secondary} />
-    </Pressable>
+    </PressableScale>
   );
 }

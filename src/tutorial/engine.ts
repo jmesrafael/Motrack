@@ -201,6 +201,25 @@ async function activateStep(index: number, gen: number): Promise<void> {
   }
   Keyboard.dismiss();
 
+  // Safety net for the UX invariant above: any unexpected throw in the wait/
+  // measure chain below (e.g. a platform API a step's target doesn't support)
+  // must never leave the store parked in 'preparing' — that renders the
+  // scrim with nothing to show and no dismiss control, trapping the user
+  // behind a dark screen forever. Bail out to idle instead.
+  try {
+    await activateStepBody(step, safeIndex, gen);
+  } catch (error) {
+    log.error('tutorial.engine.activateStepFailed', {
+      stepId: step.id,
+      message: error instanceof Error ? error.message : String(error),
+    });
+    if (gen === generation) {
+      pauseQuietly();
+    }
+  }
+}
+
+async function activateStepBody(step: TutorialStep, safeIndex: number, gen: number): Promise<void> {
   if (step.route !== undefined && !matchRoute(step.route, currentPathname)) {
     const reached = await waitForRoute(step.route, gen);
     if (gen !== generation) {

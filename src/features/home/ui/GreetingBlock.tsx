@@ -13,8 +13,8 @@ const useStyles = makeStyles((t) =>
       gap: 2,
       paddingHorizontal: t.space.s1,
     },
-    title: typeStyle(t.type.h1, t.text.primary),
-    date: typeStyle(t.type.caption, t.text.tertiary),
+    title: typeStyle(t.type.h1, t.text.primary, t.type.family),
+    date: typeStyle(t.type.caption, t.text.tertiary, t.type.family),
   }),
 );
 

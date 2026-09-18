@@ -1,8 +1,9 @@
 import { useRouter } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { Card } from '@/components/Card';
 import { Icon, type IconName } from '@/components/Icon';
+import { ListSection } from '@/components/ListSection';
+import { PressableScale } from '@/components/PressableScale';
 import { Screen } from '@/components/Screen';
 import { useActiveBike } from '@/hooks/useActiveBike';
 import { makeStyles, typeStyle } from '@/theme/styles';
@@ -11,34 +12,45 @@ import { useTheme } from '@/theme/useTheme';
 interface LogOption {
   icon: IconName;
   label: string;
+  caption: string;
   href: '/maintenance/log' | '/fuel/log' | '/expense/log' | '/repair/log' | '/odometer';
 }
 
 const OPTIONS: LogOption[] = [
-  { icon: 'maintenance', label: 'Log maintenance', href: '/maintenance/log' },
-  { icon: 'fuel', label: 'Log fuel', href: '/fuel/log' },
-  { icon: 'expense', label: 'Add expense', href: '/expense/log' },
-  { icon: 'repair', label: 'Log repair', href: '/repair/log' },
-  { icon: 'odometer', label: 'Update odometer', href: '/odometer' },
+  { icon: 'maintenance', label: 'Log maintenance', caption: 'Oil, tires, brakes, and more', href: '/maintenance/log' },
+  { icon: 'fuel', label: 'Log fuel', caption: 'Track cost and consumption', href: '/fuel/log' },
+  { icon: 'expense', label: 'Add expense', caption: 'Registration, gear, parking', href: '/expense/log' },
+  { icon: 'repair', label: 'Log repair', caption: 'Unplanned fixes', href: '/repair/log' },
+  { icon: 'odometer', label: 'Update odometer', caption: 'Keep your mileage current', href: '/odometer' },
 ];
 
 const useStyles = makeStyles((t) =>
   StyleSheet.create({
     title: typeStyle(t.type.h1, t.text.primary),
-    row: { flexDirection: 'row', alignItems: 'center', gap: t.space.s3 },
+    subtitle: typeStyle(t.type.body, t.text.secondary),
+    row: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: t.space.s3,
+      minHeight: t.size.row,
+      paddingHorizontal: t.space.s4,
+      paddingVertical: t.space.s3,
+    },
     iconWell: {
-      width: 44,
-      height: 44,
-      borderRadius: t.radius.full,
+      width: t.size.iconWell,
+      height: t.size.iconWell,
+      borderRadius: t.radius.md,
       backgroundColor: t.primary.bg,
       alignItems: 'center',
       justifyContent: 'center',
     },
+    body: { flex: 1, gap: 2 },
     label: typeStyle(t.type.bodyStrong, t.text.primary),
+    caption: typeStyle(t.type.caption, t.text.tertiary),
   }),
 );
 
-/** Log launcher (center tab) — routes to each logging form (SCREEN_SPECIFICATIONS.md §0). */
+/** Log launcher (center tab, raised FAB) — routes to each logging form. */
 export default function LogRoute() {
   const styles = useStyles();
   const router = useRouter();
@@ -46,25 +58,32 @@ export default function LogRoute() {
   const { activeBike } = useActiveBike();
 
   return (
-    <Screen>
+    <Screen withTabBarInset>
       <Text style={styles.title}>Log</Text>
-      {OPTIONS.map((option) => (
-        <Card
-          key={option.href}
-          onPress={() => {
-            if (activeBike !== null) {
-              router.push(option.href);
-            }
-          }}
-          accessibilityLabel={option.label}>
-          <View style={styles.row}>
+      <Text style={styles.subtitle}>What did you do with your bike today?</Text>
+      <ListSection title="Quick log">
+        {OPTIONS.map((option) => (
+          <PressableScale
+            key={option.href}
+            style={styles.row}
+            onPress={() => {
+              if (activeBike !== null) {
+                router.push(option.href);
+              }
+            }}
+            accessibilityRole="button"
+            accessibilityLabel={option.label}>
             <View style={styles.iconWell}>
-              <Icon name={option.icon} size={tokens.iconSize.md} color={tokens.primary.base} />
+              <Icon name={option.icon} size={tokens.iconSize.md} color={tokens.primary.text} />
             </View>
-            <Text style={styles.label}>{option.label}</Text>
-          </View>
-        </Card>
-      ))}
+            <View style={styles.body}>
+              <Text style={styles.label}>{option.label}</Text>
+              <Text style={styles.caption}>{option.caption}</Text>
+            </View>
+            <Icon name="chevronRight" size={tokens.iconSize.inline} color={tokens.icon.secondary} />
+          </PressableScale>
+        ))}
+      </ListSection>
     </Screen>
   );
 }

@@ -9,8 +9,10 @@ import { FormField } from '@/components/FormField';
 import { PickerField } from '@/components/PickerField';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { Screen } from '@/components/Screen';
+import { ScreenHeader } from '@/components/ScreenHeader';
 import { SecondaryButton } from '@/components/SecondaryButton';
 import { TextField } from '@/components/TextField';
+import { showToast } from '@/components/Toast';
 import { useActiveBike } from '@/hooks/useActiveBike';
 import { strings } from '@/i18n/strings';
 import { todayIso } from '@/lib/dates';
@@ -86,19 +88,25 @@ export default function AddDocumentRoute() {
       setError(result.error.message);
       return;
     }
+    showToast('Document saved');
     router.back();
   };
 
   return (
     <Screen>
-      <Text style={styles.title}>Add document</Text>
+      <ScreenHeader title="Add document" />
       {error !== undefined ? <Text style={styles.error}>{error}</Text> : null}
       <FormField label="Type" required>
         <PickerField options={DOC_TYPE_OPTIONS} value={docType} onChange={setDocType} placeholder="Select type" />
       </FormField>
-      <SecondaryButton label={file !== undefined ? 'File selected ✓' : 'Choose from library'} onPress={pickFromLibrary} />
-      <SecondaryButton label="Take photo" onPress={pickFromCamera} />
-      <SecondaryButton label="Choose file (PDF)" onPress={pickFile} />
+      <SecondaryButton
+        icon="image"
+        label={file !== undefined ? 'File selected ✓' : 'Choose from library'}
+        onPress={pickFromLibrary}
+        block
+      />
+      <SecondaryButton icon="camera" label="Take photo" onPress={pickFromCamera} block />
+      <SecondaryButton icon="file" label="Choose file (PDF)" onPress={pickFile} block />
       <FormField label="Title" required>
         <TextField value={title} onChangeText={setTitle} maxLength={60} placeholder={strings.docTypes[docType]} />
       </FormField>

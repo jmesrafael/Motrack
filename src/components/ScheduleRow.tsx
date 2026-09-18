@@ -1,6 +1,7 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { Icon, type IconName } from '@/components/Icon';
+import { PressableScale } from '@/components/PressableScale';
 import { StatusPill, type PillStatus } from '@/components/StatusPill';
 import { makeStyles, typeStyle } from '@/theme/styles';
 import { useTheme } from '@/theme/useTheme';
@@ -20,14 +21,14 @@ const useStyles = makeStyles((t) =>
       flexDirection: 'row',
       alignItems: 'center',
       gap: t.space.s3,
-      minHeight: 56,
+      minHeight: t.size.row,
       paddingHorizontal: t.space.s4,
       paddingVertical: t.space.s3,
     },
     iconWell: {
-      width: 36,
-      height: 36,
-      borderRadius: t.radius.full,
+      width: t.size.iconWell,
+      height: t.size.iconWell,
+      borderRadius: t.radius.md,
       backgroundColor: t.bg.surfaceVariant,
       alignItems: 'center',
       justifyContent: 'center',
@@ -36,36 +37,31 @@ const useStyles = makeStyles((t) =>
       flex: 1,
       gap: 2,
     },
-    label: typeStyle(t.type.bodyStrong, t.text.primary),
-    remaining: typeStyle(t.type.caption, t.text.secondary),
+    label: typeStyle(t.type.bodyStrong, t.text.primary, t.type.family),
+    remaining: typeStyle(t.type.caption, t.text.secondary, t.type.family),
   }),
 );
 
-export function ScheduleRow({
-  icon,
-  label,
-  status,
-  statusLabel,
-  remainingText,
-  onPress,
-}: ScheduleRowProps) {
+export function ScheduleRow({ icon, label, status, statusLabel, remainingText, onPress }: ScheduleRowProps) {
   const styles = useStyles();
   const { tokens } = useTheme();
 
   return (
-    <Pressable
+    <PressableScale
       onPress={onPress}
+      dim
+      scaleTo={0.99}
       accessibilityRole="button"
       accessibilityLabel={`${label}, ${statusLabel}, ${remainingText}`}
-      style={({ pressed }) => [styles.row, pressed && { opacity: 0.7 }]}>
+      style={styles.row}>
       <View style={styles.iconWell}>
-        <Icon name={icon} size={tokens.iconSize.listLeading} />
+        <Icon name={icon} size={tokens.iconSize.listLeading} color={tokens.status[status].base} />
       </View>
       <View style={styles.body}>
         <Text style={styles.label}>{label}</Text>
         <Text style={styles.remaining}>{remainingText}</Text>
       </View>
       <StatusPill status={status} label={statusLabel} />
-    </Pressable>
+    </PressableScale>
   );
 }

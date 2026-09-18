@@ -55,10 +55,10 @@ const useStyles = makeStyles((t) =>
       gap: t.space.s1,
     },
     score: {
-      ...typeStyle(t.type.display, t.text.primary),
+      ...typeStyle(t.type.stat, t.text.primary, t.type.family),
       fontVariant: ['tabular-nums'],
     },
-    suffix: typeStyle(t.type.caption, t.text.tertiary),
+    suffix: typeStyle(t.type.caption, t.text.tertiary, t.type.family),
     bandChip: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -73,7 +73,7 @@ const useStyles = makeStyles((t) =>
       height: 8,
       borderRadius: t.radius.full,
     },
-    bandLabel: typeStyle(t.type.caption, t.text.primary),
+    bandLabel: typeStyle(t.type.captionStrong, t.text.primary, t.type.family),
   }),
 );
 
@@ -164,7 +164,7 @@ export function HealthRing({
           />
         ) : null}
       </Svg>
-      <View style={styles.center} pointerEvents="none">
+      <View style={[styles.center, { pointerEvents: 'none' }]}>
         <Text style={styles.score}>{score === null ? '—' : String(score)}</Text>
         <Text style={styles.suffix}>{scoreSuffix}</Text>
         <View style={[styles.bandChip, { backgroundColor: colorBg }]}>

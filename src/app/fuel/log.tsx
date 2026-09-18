@@ -2,13 +2,17 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Text } from 'react-native';
 
+import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { DateField } from '@/components/DateField';
+import { DestructiveButton } from '@/components/DestructiveButton';
 import { FormField } from '@/components/FormField';
 import { MoneyInput } from '@/components/MoneyInput';
 import { OdoInput } from '@/components/OdoInput';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { Screen } from '@/components/Screen';
+import { ScreenHeader } from '@/components/ScreenHeader';
 import { TextField } from '@/components/TextField';
+import { showToast } from '@/components/Toast';
 import { Toggle } from '@/components/Toggle';
 import { FuelRepository } from '@/db/repositories/FuelRepository';
 import { useActiveBike } from '@/hooks/useActiveBike';
@@ -42,6 +46,7 @@ export default function FuelLogRoute() {
   const [notes, setNotes] = useState(existing?.notes ?? '');
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>();
   const [error, setError] = useState<string>();
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
 
   const bikeId = existing?.motorcycleId ?? activeBike?.id ?? null;
   if (bikeId === null) {
@@ -71,7 +76,17 @@ export default function FuelLogRoute() {
       setError(result.error.message);
       return;
     }
+    showToast(existing !== undefined ? 'Fuel log updated' : 'Fuel log saved');
     router.back();
+  };
+
+  const handleDelete = () => {
+    setConfirmingDelete(false);
+    if (existing !== undefined) {
+      FuelLogService.deleteFuelLog(existing.id);
+      showToast({ kind: 'info', message: 'Fuel log deleted' });
+      router.back();
+    }
   };
 
   const priceLabel =
@@ -81,7 +96,7 @@ export default function FuelLogRoute() {
 
   return (
     <Screen>
-      <Text style={styles.title}>{existing !== undefined ? 'Edit fuel log' : 'Log fuel'}</Text>
+      <ScreenHeader title={existing !== undefined ? 'Edit fuel log' : 'Log fuel'} />
       {error !== undefined ? <Text style={styles.error}>{error}</Text> : null}
       <FormField label="Liters" required error={fieldErrors?.liters}>
         <TextField value={liters} onChangeText={(v) => setLiters(v.replace(/[^0-9.]/g, ''))} keyboardType="decimal-pad" />
@@ -103,6 +118,17 @@ export default function FuelLogRoute() {
         <TextField value={notes} onChangeText={setNotes} multiline maxLength={500} />
       </FormField>
       <PrimaryButton label={existing !== undefined ? 'Save changes' : 'Save'} onPress={handleSubmit} />
+      {existing !== undefined ? (
+        <DestructiveButton label="Delete fuel log" onPress={() => setConfirmingDelete(true)} />
+      ) : null}
+      <ConfirmDialog
+        visible={confirmingDelete}
+        title="Delete this fuel log?"
+        body="This removes it from your fuel history and consumption stats. Recoverable for 30 days."
+        confirmLabel="Delete log"
+        onConfirm={handleDelete}
+        onCancel={() => setConfirmingDelete(false)}
+      />
     </Screen>
   );
 }

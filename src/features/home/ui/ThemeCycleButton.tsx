@@ -1,14 +1,17 @@
-import { Pressable, StyleSheet } from 'react-native';
+import { useState } from 'react';
+import { Animated, StyleSheet } from 'react-native';
 
 import { Icon, type IconName } from '@/components/Icon';
+import { PressableScale } from '@/components/PressableScale';
 import { interpolate, strings } from '@/i18n/strings';
 import { useSettingsStore } from '@/stores/useSettingsStore';
 import { makeStyles } from '@/theme/styles';
 import { useTheme } from '@/theme/useTheme';
 
 /**
- * Validation-phase switcher: steps system → light → dark. The shipped picker
- * lives in Settings and lists the registry (S-30, THEME_GUIDE.md §5).
+ * Dashboard quick switcher: system → light → dark. The shipped picker lives
+ * in Settings and lists the registry (THEME_GUIDE.md §5). A quarter-turn spin
+ * on press sells the mode change alongside the app-wide cross-dissolve.
  */
 const PREFERENCE_ICONS: Partial<Record<string, IconName>> = {
   system: 'themeSystem',
@@ -19,8 +22,8 @@ const PREFERENCE_ICONS: Partial<Record<string, IconName>> = {
 const useStyles = makeStyles((t) =>
   StyleSheet.create({
     button: {
-      width: 44,
-      height: 44,
+      width: t.size.iconWell,
+      height: t.size.iconWell,
       borderRadius: t.radius.full,
       backgroundColor: t.bg.surfaceVariant,
       alignItems: 'center',
@@ -33,6 +36,7 @@ export function ThemeCycleButton() {
   const styles = useStyles();
   const { tokens, preference } = useTheme();
   const cycle = useSettingsStore((s) => s.cycleThemePreference);
+  const [rotation] = useState(() => new Animated.Value(0));
 
   const modeLabel =
     preference === 'system'
@@ -41,16 +45,28 @@ export function ThemeCycleButton() {
         ? strings.themeSwitcher.light
         : strings.themeSwitcher.dark;
 
+  const handlePress = () => {
+    rotation.setValue(0);
+    Animated.timing(rotation, {
+      toValue: 1,
+      duration: tokens.motion.base.durationMs,
+      useNativeDriver: true,
+    }).start();
+    cycle();
+  };
+
+  const spin = rotation.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '180deg'] });
+
   return (
-    <Pressable
-      onPress={cycle}
+    <PressableScale
+      onPress={handlePress}
+      scaleTo={0.92}
       accessibilityRole="button"
       accessibilityLabel={interpolate(strings.themeSwitcher.a11y, { mode: modeLabel })}
-      style={({ pressed }) => [styles.button, pressed && { opacity: 0.7 }]}>
-      <Icon
-        name={PREFERENCE_ICONS[preference] ?? 'themeSystem'}
-        size={tokens.iconSize.md}
-      />
-    </Pressable>
+      style={styles.button}>
+      <Animated.View style={{ transform: [{ rotate: spin }] }}>
+        <Icon name={PREFERENCE_ICONS[preference] ?? 'themeSystem'} size={tokens.iconSize.md} />
+      </Animated.View>
+    </PressableScale>
   );
 }

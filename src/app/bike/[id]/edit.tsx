@@ -5,14 +5,15 @@ import { Text, View } from 'react-native';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { DestructiveButton } from '@/components/DestructiveButton';
 import { Screen } from '@/components/Screen';
+import { ScreenHeader } from '@/components/ScreenHeader';
 import { SecondaryButton } from '@/components/SecondaryButton';
+import { showToast } from '@/components/Toast';
 import { MotorcycleRepository } from '@/db/repositories/MotorcycleRepository';
 import { BikeForm, toMotorcycleInput, type BikeFormValues } from '@/features/garage/ui/BikeForm';
 import { MotorcycleService } from '@/services/MotorcycleService';
 import { makeStyles, typeStyle } from '@/theme/styles';
 
 const useStyles = makeStyles((t) => ({
-  title: typeStyle(t.type.h1, t.text.primary),
   error: typeStyle(t.type.caption, t.feedback.error.base),
   actions: { gap: t.space.s2, marginTop: t.space.s2 },
 }));
@@ -31,7 +32,7 @@ export default function EditBikeRoute() {
   if (bike === undefined) {
     return (
       <Screen>
-        <Text style={styles.title}>Motorcycle not found</Text>
+        <ScreenHeader title="Motorcycle not found" />
       </Screen>
     );
   }
@@ -46,23 +47,27 @@ export default function EditBikeRoute() {
       setFormError(result.error.message);
       return;
     }
+    showToast('Motorcycle updated');
     router.back();
   };
 
   const handleArchiveToggle = () => {
-    MotorcycleService.setArchived(bike.id, bike.isArchived === 0);
+    const archiving = bike.isArchived === 0;
+    MotorcycleService.setArchived(bike.id, archiving);
+    showToast(archiving ? `${bike.nickname} archived` : `${bike.nickname} unarchived`);
     router.back();
   };
 
   const handleDelete = () => {
     setConfirmingDelete(false);
     MotorcycleService.deleteBike(bike.id);
+    showToast({ kind: 'info', message: `${bike.nickname} deleted` });
     router.replace('/(tabs)');
   };
 
   return (
     <Screen>
-      <Text style={styles.title}>Edit motorcycle</Text>
+      <ScreenHeader title="Edit motorcycle" />
       {formError !== undefined ? <Text style={styles.error}>{formError}</Text> : null}
       <BikeForm
         initial={bike}
@@ -81,7 +86,7 @@ export default function EditBikeRoute() {
       <ConfirmDialog
         visible={confirmingDelete}
         title="Delete this motorcycle?"
-        body={`Type "${bike.nickname}" to confirm. This removes all its records — recoverable for 30 days.`}
+        body={`Type "${bike.nickname}" to confirm. This removes all its records. Recoverable for 30 days.`}
         confirmLabel="Delete"
         typedConfirmation={bike.nickname}
         onConfirm={handleDelete}

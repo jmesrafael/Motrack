@@ -6,12 +6,17 @@ import {
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
+import { AppState } from 'react-native';
 
+import { AppLoadingScreen } from '@/components/AppLoadingScreen';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { RecoveryScreen } from '@/components/RecoveryScreen';
+import { ToastHost } from '@/components/Toast';
 import { initDatabase } from '@/db/client';
+import { initNotifications, triggerReplan, wireNotificationCascade } from '@/services/NotificationScheduler';
 import { useSettingsStore } from '@/stores/useSettingsStore';
 import { useTutorialStore } from '@/stores/useTutorialStore';
+import { loadBrandFonts } from '@/theme/fonts';
 import { ThemeProvider } from '@/theme/ThemeProvider';
 import { useTheme } from '@/theme/useTheme';
 import { TutorialHost } from '@/tutorial/ui/TutorialHost';
@@ -46,9 +51,11 @@ function ThemedNavigation() {
 }
 
 /**
- * Startup sequence (DATA_FLOW.md §1): open DB + apply migrations, then hydrate
- * settings, before first navigation render. Migration failure blocks with the
- * recovery screen (ERROR_HANDLING.md §7) — never a half-migrated app.
+ * Startup sequence (DATA_FLOW.md §1): open DB + apply migrations, hydrate
+ * settings, and register the brand font, before first navigation render.
+ * Migration failure blocks with the recovery screen (ERROR_HANDLING.md §7) —
+ * never a half-migrated app. Font load failure never blocks — typeStyle()
+ * falls back to the platform font automatically.
  */
 function useStartup() {
   const [ready, setReady] = useState(false);
@@ -62,10 +69,11 @@ function useStartup() {
       initDatabase();
       hydrate();
       hydrateTutorial();
-      setReady(true);
     } catch {
       setFailed(true);
+      return;
     }
+    loadBrandFonts().finally(() => setReady(true));
   };
 
   useEffect(attempt, []);
@@ -73,19 +81,46 @@ function useStartup() {
   return { ready, failed, retry: attempt };
 }
 
+/**
+ * Wires the notification re-plan cascade once the DB is ready (NOTIFICATION_ENGINE.md
+ * §5, §9a): domain-event-driven re-plans plus a re-plan on every app
+ * foreground, which doubles as the reboot/timezone recovery path.
+ */
+function useNotificationCascade(ready: boolean): void {
+  useEffect(() => {
+    if (!ready) {
+      return;
+    }
+    initNotifications();
+    triggerReplan();
+    const offCascade = wireNotificationCascade();
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state === 'active') {
+        triggerReplan();
+      }
+    });
+    return () => {
+      offCascade();
+      subscription.remove();
+    };
+  }, [ready]);
+}
+
 function StartupGate() {
   const { ready, failed, retry } = useStartup();
+  useNotificationCascade(ready);
 
   if (failed) {
     return <RecoveryScreen onRetry={retry} />;
   }
   if (!ready) {
-    return null;
+    return <AppLoadingScreen />;
   }
   return (
     <ErrorBoundary>
       <ThemedNavigation />
       <TutorialHost />
+      <ToastHost />
     </ErrorBoundary>
   );
 }

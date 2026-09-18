@@ -22,10 +22,10 @@ const useStyles = makeStyles((t) =>
       gap: t.space.s3,
     },
     iconWell: {
-      width: 44,
-      height: 44,
-      borderRadius: t.radius.full,
-      backgroundColor: t.bg.surfaceVariant,
+      width: t.size.iconWell,
+      height: t.size.iconWell,
+      borderRadius: t.radius.md,
+      backgroundColor: t.primary.bg,
       alignItems: 'center',
       justifyContent: 'center',
     },
@@ -33,12 +33,12 @@ const useStyles = makeStyles((t) =>
       flex: 1,
       gap: 2,
     },
-    label: typeStyle(t.type.caption, t.text.secondary),
+    label: typeStyle(t.type.caption, t.text.secondary, t.type.family),
     value: {
-      ...typeStyle(t.type.h1, t.text.primary),
+      ...typeStyle(t.type.h1, t.text.primary, t.type.family),
       fontVariant: ['tabular-nums'],
     },
-    asOf: typeStyle(t.type.caption, t.text.tertiary),
+    asOf: typeStyle(t.type.caption, t.text.tertiary, t.type.family),
   }),
 );
 
@@ -50,7 +50,7 @@ export function OdometerCard({ odometerKm, asOfIso, onUpdate }: OdometerCardProp
     <Card>
       <View style={styles.row}>
         <View style={styles.iconWell}>
-          <Icon name="odometer" size={tokens.iconSize.md} />
+          <Icon name="odometer" size={tokens.iconSize.md} color={tokens.primary.text} />
         </View>
         <View style={styles.body}>
           <Text style={styles.label}>{strings.dashboard.odometer.title}</Text>
@@ -59,7 +59,7 @@ export function OdometerCard({ odometerKm, asOfIso, onUpdate }: OdometerCardProp
             {interpolate(strings.dashboard.odometer.asOf, { date: formatMonthDay(asOfIso) })}
           </Text>
         </View>
-        <SecondaryButton label={strings.dashboard.odometer.update} onPress={onUpdate} />
+        <SecondaryButton label={strings.dashboard.odometer.update} onPress={onUpdate} size="sm" />
       </View>
     </Card>
   );

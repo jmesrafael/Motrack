@@ -16,7 +16,16 @@ export default function TabsLayout() {
   }
 
   return (
-    <Tabs tabBar={(props) => <TabBar {...props} />} screenOptions={{ headerShown: false }}>
+    <Tabs
+      tabBar={(props) => <TabBar {...props} />}
+      screenOptions={{
+        headerShown: false,
+        // The custom TabBar floats (position: absolute, own glass pill), so
+        // the navigator's own tab bar chrome/slot must not reserve space or
+        // paint a background behind it — otherwise its default flat bar
+        // shows through underneath ours.
+        tabBarStyle: { position: 'absolute', backgroundColor: 'transparent', borderTopWidth: 0, elevation: 0 },
+      }}>
       <Tabs.Screen name="index" options={{ title: strings.tabs.home }} />
       <Tabs.Screen name="maintenance" options={{ title: strings.tabs.maintenance }} />
       <Tabs.Screen name="log" options={{ title: strings.tabs.log }} />

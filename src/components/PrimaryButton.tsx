@@ -1,54 +1,25 @@
-import { ActivityIndicator, Pressable, StyleSheet, Text } from 'react-native';
-
-import { makeStyles, typeStyle } from '@/theme/styles';
-import { useTheme } from '@/theme/useTheme';
+import { Button } from '@/components/Button';
+import type { IconName } from '@/components/Icon';
 
 export interface PrimaryButtonProps {
   label: string;
   onPress: () => void;
   loading?: boolean;
   disabled?: boolean;
+  icon?: IconName;
 }
 
-const useStyles = makeStyles((t) =>
-  StyleSheet.create({
-    button: {
-      minHeight: 48,
-      paddingHorizontal: t.space.s5,
-      borderRadius: t.radius.full,
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: t.primary.base,
-    },
-    disabled: {
-      backgroundColor: t.state.disabledBg,
-    },
-    label: typeStyle(t.type.bodyStrong, '#fff'),
-  }),
-);
-
-export function PrimaryButton({ label, onPress, loading = false, disabled = false }: PrimaryButtonProps) {
-  const styles = useStyles();
-  const { tokens } = useTheme();
-  const isDisabled = disabled || loading;
-
+/** Compatibility wrapper — the primary "next action" button (see Button). */
+export function PrimaryButton({ label, onPress, loading = false, disabled = false, icon }: PrimaryButtonProps) {
   return (
-    <Pressable
+    <Button
+      label={label}
       onPress={onPress}
-      disabled={isDisabled}
-      accessibilityRole="button"
-      accessibilityLabel={label}
-      accessibilityState={{ disabled: isDisabled, busy: loading }}
-      style={({ pressed }) => [
-        styles.button,
-        isDisabled && styles.disabled,
-        pressed && !isDisabled && { opacity: 0.85 },
-      ]}>
-      {loading ? (
-        <ActivityIndicator color={tokens.primary.on} />
-      ) : (
-        <Text style={[styles.label, { color: tokens.primary.on }]}>{label}</Text>
-      )}
-    </Pressable>
+      loading={loading}
+      disabled={disabled}
+      {...(icon !== undefined ? { icon } : {})}
+      variant="primary"
+      size="lg"
+    />
   );
 }

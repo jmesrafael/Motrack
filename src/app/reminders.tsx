@@ -5,19 +5,21 @@ import { StyleSheet, Text, View } from 'react-native';
 import { EmptyState } from '@/components/EmptyState';
 import { Screen } from '@/components/Screen';
 import { ScheduleRow } from '@/components/ScheduleRow';
+import { ScreenHeader } from '@/components/ScreenHeader';
 import { SecondaryButton } from '@/components/SecondaryButton';
-import { ScheduleRepository } from '@/db/repositories/ScheduleRepository';
+import { ListSkeleton } from '@/components/Skeleton';
+import { showToast } from '@/components/Toast';
 import { componentIcon, componentLabel } from '@/features/maintenance/componentMeta';
 import { strings } from '@/i18n/strings';
 import { addDays, todayIso } from '@/lib/dates';
+import { ScheduleService } from '@/services/ScheduleService';
 import { useReminderStore, type ReminderItem } from '@/stores/useReminderStore';
 import { makeStyles, typeStyle } from '@/theme/styles';
 import type { ComponentType } from '@/types/enums';
 
 const useStyles = makeStyles((t) =>
   StyleSheet.create({
-    title: typeStyle(t.type.h1, t.text.primary),
-    sectionTitle: { ...typeStyle(t.type.h2, t.text.primary), marginTop: t.space.s4 },
+    sectionTitle: { ...typeStyle(t.type.h2, t.text.primary), marginTop: t.space.s4, paddingHorizontal: t.space.s1 },
     itemGroup: { gap: t.space.s1 },
   }),
 );
@@ -42,10 +44,20 @@ export default function RemindersRoute() {
     }
   }, [status, load]);
 
+  if (status === 'idle') {
+    return (
+      <Screen>
+        <ScreenHeader title="Reminders" />
+        <ListSkeleton rows={3} />
+      </Screen>
+    );
+  }
+
   if (items.length === 0) {
     return (
       <Screen scroll={false}>
-        <EmptyState icon="reminder" title="All caught up" body="Nothing due right now." />
+        <ScreenHeader title="Reminders" />
+        <EmptyState icon="checkCircle" title="All caught up" body="Nothing due right now. Come back after your next ride." />
       </Screen>
     );
   }
@@ -54,7 +66,7 @@ export default function RemindersRoute() {
 
   return (
     <Screen>
-      <Text style={styles.title}>Reminders</Text>
+      <ScreenHeader title="Reminders" />
       {buckets.map((bucket) => {
         const bucketItems = items.filter((i) => i.bucket === bucket);
         if (bucketItems.length === 0) {
@@ -86,9 +98,11 @@ export default function RemindersRoute() {
                   {bucket !== 'overdue' ? (
                     <SecondaryButton
                       label="Snooze 1 week"
+                      size="sm"
                       onPress={() => {
-                        ScheduleRepository.update(item.schedule.id, { snoozedUntil: addDays(todayIso(), 7) });
+                        ScheduleService.snooze(item.schedule.id, addDays(todayIso(), 7));
                         load();
+                        showToast({ kind: 'info', message: 'Snoozed for 1 week' });
                       }}
                     />
                   ) : null}

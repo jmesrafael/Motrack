@@ -1,7 +1,9 @@
 import type { ReactNode } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { Icon } from '@/components/Icon';
+import { IconButton } from '@/components/IconButton';
+import { PressableScale } from '@/components/PressableScale';
 import { makeStyles, typeStyle } from '@/theme/styles';
 import { useTheme } from '@/theme/useTheme';
 import { TutorialAnchor } from '@/tutorial/ui/TutorialAnchor';
@@ -13,7 +15,7 @@ export interface AppHeaderProps {
   reminderCount: number;
   remindersA11yLabel: string;
   onRemindersPress: () => void;
-  /** Extra header action slot (validation phase hosts the theme switcher). */
+  /** Extra header action slot (theme switcher). */
   trailing?: ReactNode;
   /** Registers the bike chip as a tutorial target (dashboard tour). */
   bikeChipAnchorId?: string;
@@ -30,14 +32,21 @@ const useStyles = makeStyles((t) =>
       flexDirection: 'row',
       alignItems: 'center',
       gap: t.space.s2,
-      minHeight: 44,
+      minHeight: t.size.buttonMd,
       paddingHorizontal: t.space.s3,
+      paddingVertical: t.space.s1,
       borderRadius: t.radius.full,
       backgroundColor: t.bg.surfaceVariant,
       flexShrink: 1,
     },
+    dot: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+      backgroundColor: t.primary.base,
+    },
     bikeLabel: {
-      ...typeStyle(t.type.bodyStrong, t.text.primary),
+      ...typeStyle(t.type.bodyStrong, t.text.primary, t.type.family),
       flexShrink: 1,
     },
     chipWrap: {
@@ -46,33 +55,15 @@ const useStyles = makeStyles((t) =>
     spacer: {
       flex: 1,
     },
-    iconButton: {
-      width: 44,
-      height: 44,
-      borderRadius: t.radius.full,
-      backgroundColor: t.bg.surfaceVariant,
+    actions: {
+      flexDirection: 'row',
       alignItems: 'center',
-      justifyContent: 'center',
-    },
-    badge: {
-      position: 'absolute',
-      top: 6,
-      right: 6,
-      minWidth: 16,
-      height: 16,
-      borderRadius: t.radius.full,
-      backgroundColor: t.feedback.error.base,
-      alignItems: 'center',
-      justifyContent: 'center',
-      paddingHorizontal: 3,
-    },
-    badgeText: {
-      ...typeStyle(t.type.label, t.primary.on),
-      lineHeight: 12,
+      gap: t.space.s2,
     },
   }),
 );
 
+/** Persistent motorcycle context (bike chip) + reminders/theme actions — the app-wide top bar. */
 export function AppHeader({
   bikeLabel,
   bikeA11yLabel,
@@ -87,17 +78,18 @@ export function AppHeader({
   const { tokens } = useTheme();
 
   const bikeChip = (
-    <Pressable
+    <PressableScale
       onPress={onBikePress}
+      scaleTo={0.96}
       accessibilityRole="button"
       accessibilityLabel={bikeA11yLabel}
-      style={({ pressed }) => [styles.bikeChip, pressed && { opacity: 0.7 }]}>
-      <Icon name="motorcycle" size={tokens.iconSize.listLeading} />
+      style={styles.bikeChip}>
+      <View style={styles.dot} />
       <Text style={styles.bikeLabel} numberOfLines={1}>
         {bikeLabel}
       </Text>
       <Icon name="chevronDown" size={tokens.iconSize.inline} color={tokens.icon.secondary} />
-    </Pressable>
+    </PressableScale>
   );
 
   return (
@@ -110,19 +102,15 @@ export function AppHeader({
         bikeChip
       )}
       <View style={styles.spacer} />
-      {trailing}
-      <Pressable
-        onPress={onRemindersPress}
-        accessibilityRole="button"
-        accessibilityLabel={remindersA11yLabel}
-        style={({ pressed }) => [styles.iconButton, pressed && { opacity: 0.7 }]}>
-        <Icon name="reminder" size={tokens.iconSize.md} />
-        {reminderCount > 0 ? (
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>{String(reminderCount)}</Text>
-          </View>
-        ) : null}
-      </Pressable>
+      <View style={styles.actions}>
+        {trailing}
+        <IconButton
+          icon="reminder"
+          onPress={onRemindersPress}
+          accessibilityLabel={remindersA11yLabel}
+          badge={reminderCount}
+        />
+      </View>
     </View>
   );
 }

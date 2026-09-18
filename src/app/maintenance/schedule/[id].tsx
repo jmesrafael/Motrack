@@ -2,10 +2,14 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Text } from 'react-native';
 
+import { ConfirmDialog } from '@/components/ConfirmDialog';
+import { DestructiveButton } from '@/components/DestructiveButton';
 import { FormField } from '@/components/FormField';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { Screen } from '@/components/Screen';
+import { ScreenHeader } from '@/components/ScreenHeader';
 import { TextField } from '@/components/TextField';
+import { showToast } from '@/components/Toast';
 import { Toggle } from '@/components/Toggle';
 import { ScheduleRepository } from '@/db/repositories/ScheduleRepository';
 import { componentLabel } from '@/features/maintenance/componentMeta';
@@ -32,6 +36,7 @@ export default function EditScheduleRoute() {
   const [customName, setCustomName] = useState(schedule?.customName ?? '');
   const [isEnabled, setIsEnabled] = useState(schedule?.isEnabled === 1);
   const [error, setError] = useState<string>();
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
 
   if (schedule === undefined) {
     return (
@@ -54,19 +59,22 @@ export default function EditScheduleRoute() {
       setError(result.error.message);
       return;
     }
+    showToast('Schedule updated');
     router.back();
   };
 
   const handleDeleteCustom = () => {
+    setConfirmingDelete(false);
     const result = ScheduleService.deleteCustomComponent(id);
     if (result.ok) {
+      showToast({ kind: 'info', message: 'Component deleted' });
       router.back();
     }
   };
 
   return (
     <Screen>
-      <Text style={styles.title}>{componentLabel(schedule.componentType as ComponentType, schedule.customName)}</Text>
+      <ScreenHeader title={componentLabel(schedule.componentType as ComponentType, schedule.customName)} />
       {error !== undefined ? <Text style={styles.error}>{error}</Text> : null}
       {isCustom ? (
         <FormField label="Name" required>
@@ -89,7 +97,15 @@ export default function EditScheduleRoute() {
       </FormField>
       <Toggle value={isEnabled} onChange={setIsEnabled} label="Enabled" />
       <PrimaryButton label="Save" onPress={handleSave} />
-      {isCustom ? <PrimaryButton label="Delete component" onPress={handleDeleteCustom} /> : null}
+      {isCustom ? <DestructiveButton label="Delete component" onPress={() => setConfirmingDelete(true)} /> : null}
+      <ConfirmDialog
+        visible={confirmingDelete}
+        title="Delete this component?"
+        body="This removes the custom component and its schedule. Logged service history for it is kept."
+        confirmLabel="Delete component"
+        onConfirm={handleDeleteCustom}
+        onCancel={() => setConfirmingDelete(false)}
+      />
     </Screen>
   );
 }

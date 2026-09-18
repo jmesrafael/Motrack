@@ -8,7 +8,7 @@ export const strings = {
     home: 'Home',
     maintenance: 'Maintenance',
     log: 'Log',
-    money: 'Money',
+    money: 'Expense',
     more: 'More',
   },
   dashboard: {
@@ -120,12 +120,35 @@ export const strings = {
   onboarding: {
     welcome: {
       title: 'Welcome to Motrack',
-      body: 'Your motorcycle logbook — maintenance, fuel, and expenses, all offline on your phone.',
+      body: 'Your motorcycle logbook for maintenance, fuel, and expenses, all offline on your phone.',
       bulletMaintenance: 'Never miss an oil change with schedules and a live Health Score.',
       bulletMoney: 'Track fuel and every peso your bike costs.',
       bulletDocuments: 'Keep OR/CR, insurance, and receipts one tap away.',
       getStarted: 'Get started',
       skipSetup: 'Skip setup',
+    },
+    carousel: {
+      brand: 'Motrack',
+      skip: 'Skip',
+      next: 'Next',
+      getStarted: 'Get started',
+      stages: [
+        {
+          eyebrow: '01',
+          title: 'Know Your Bike',
+          body: 'Keep your motorcycle information organized in one place — model, plate, VIN, and the odometer that drives everything else.',
+        },
+        {
+          eyebrow: '02',
+          title: 'Never Miss Maintenance',
+          body: 'Track services, maintenance schedules, mileage, and upcoming tasks with a live Health Score for your bike.',
+        },
+        {
+          eyebrow: '03',
+          title: 'Keep Your History',
+          body: 'Build a useful maintenance history over time — every service, every peso spent, one searchable timeline.',
+        },
+      ] as { eyebrow: string; title: string; body: string }[],
     },
     setup: {
       title: 'Set up your bike',
@@ -144,7 +167,7 @@ export const strings = {
       },
       oil: {
         title: 'Last oil change',
-        body: 'Roughly when was the engine oil last changed? This seeds your maintenance schedule — skip it if you are not sure.',
+        body: 'Roughly when was the engine oil last changed? This seeds your maintenance schedule. Skip it if you are not sure.',
         dateLabel: 'Date of last oil change',
         odoLabel: 'Odometer at that time (km, optional)',
         save: 'Save oil change',
@@ -172,10 +195,10 @@ export const strings = {
       skip: 'Skip tour',
       closeA11y: 'Close tutorial',
       stepOf: 'Step {current} of {total}',
-      tryIt: 'Try it now — tap the highlighted control.',
-      tryItLong: 'Try it now — press and hold the highlighted control.',
-      tryItNavigate: 'Try it now — the tour continues on the next screen.',
-      tryItSave: 'Try it now — the tour continues after you save.',
+      tryIt: 'Try it now: tap the highlighted control.',
+      tryItLong: 'Try it now: press and hold the highlighted control.',
+      tryItNavigate: 'Try it now. The tour continues on the next screen.',
+      tryItSave: 'Try it now. The tour continues after you save.',
     },
     offer: {
       title: 'Would you like a quick tour?',
@@ -195,7 +218,7 @@ export const strings = {
       title: 'Dashboard tour',
       intro: {
         title: 'This is your dashboard',
-        body: 'Everything about your bike at a glance. A few highlights — skip anytime.',
+        body: 'Everything about your bike at a glance. A few highlights, skip anytime.',
       },
       bikeChip: {
         title: 'Your active bike',
@@ -203,7 +226,7 @@ export const strings = {
       },
       bikeChipSingle: {
         title: 'Your bike',
-        body: 'Tap here to open the Garage — add more bikes and switch between them anytime.',
+        body: 'Tap here to open the Garage. Add more bikes and switch between them anytime.',
       },
       health: {
         title: 'Health Score',
@@ -211,7 +234,7 @@ export const strings = {
       },
       odometer: {
         title: 'Odometer',
-        body: 'Keep this current — schedules, reminders, and fuel stats all build on it.',
+        body: 'Keep this current. Schedules, reminders, and fuel stats all build on it.',
       },
       quickActions: {
         title: 'Quick actions',
@@ -223,7 +246,7 @@ export const strings = {
       },
       maintenanceList: {
         title: 'Your schedule',
-        body: 'Each component shows its status — OK, due soon, or overdue — from your odometer and history.',
+        body: 'Each component shows its status (OK, due soon, or overdue) from your odometer and history.',
       },
     },
     garage: {
@@ -234,7 +257,7 @@ export const strings = {
       },
       addBike: {
         title: 'Add motorcycles',
-        body: 'Track as many bikes as you like — each keeps its own schedule and history.',
+        body: 'Track as many bikes as you like. Each keeps its own schedule and history.',
       },
     },
     maintenance: {
@@ -245,7 +268,7 @@ export const strings = {
       },
       schedule: {
         title: 'Component schedules',
-        body: 'Every part is tracked by kilometers and months — tap one for details and history.',
+        body: 'Every part is tracked by kilometers and months. Tap one for details and history.',
       },
       history: {
         title: 'Service history',
@@ -264,14 +287,14 @@ export const strings = {
       },
       form: {
         title: 'Quick entry',
-        body: 'Liters, cost, odometer — full tank toggles give you accurate km/L.',
+        body: 'Liters, cost, odometer. Full tank toggles give you accurate km/L.',
       },
     },
     expenses: {
       title: 'Expenses tour',
       intro: {
         title: 'Expenses',
-        body: 'Every peso beyond fuel and services — registration, gear, parking, washes.',
+        body: 'Every peso beyond fuel and services: registration, gear, parking, washes.',
       },
       form: {
         title: 'Categorized spending',
@@ -289,28 +312,28 @@ export const strings = {
       title: 'Documents tour',
       intro: {
         title: 'Documents',
-        body: 'Store OR/CR, insurance, and receipts — with expiry warnings before they lapse.',
+        body: 'Store OR/CR, insurance, and receipts, with expiry warnings before they lapse.',
       },
     },
     statistics: {
       title: 'Statistics tour',
       intro: {
         title: 'Statistics',
-        body: 'Cost per kilometer, monthly spending, and fuel efficiency — computed from your logs.',
+        body: 'Cost per kilometer, monthly spending, and fuel efficiency, computed from your logs.',
       },
     },
     search: {
       title: 'Search tour',
       intro: {
         title: 'Search',
-        body: 'Find any record — services, fuel-ups, expenses, documents — from one box.',
+        body: 'Find any record (services, fuel-ups, expenses, documents) from one box.',
       },
     },
     settings: {
       title: 'Settings tour',
       intro: {
         title: 'Settings',
-        body: 'Theme, language, data & privacy — and this Help & Tutorials section.',
+        body: 'Theme, language, data & privacy, and this Help & Tutorials section.',
       },
     },
   },
@@ -325,7 +348,7 @@ export const strings = {
     },
     documents: {
       title: 'Paperwork, handled',
-      body: 'Add OR/CR and insurance with expiry dates — Motrack warns you on the dashboard before they lapse.',
+      body: 'Add OR/CR and insurance with expiry dates. Motrack warns you on the dashboard before they lapse.',
     },
   },
   help: {
@@ -346,6 +369,51 @@ export const strings = {
     resetTitle: 'Reset tutorial progress?',
     resetBody: 'Tours, tips, and onboarding will be marked unseen. Motorcycles, maintenance, fuel, expenses, and documents are not touched.',
     resetConfirm: 'Reset progress',
+  },
+  /** Canonical copy templates — NOTIFICATION_ENGINE.md §8. Use with `interpolate`. */
+  notification: {
+    due: {
+      km: {
+        title: '{component} due soon',
+        body: '{bike}: {component} in about {remainingKm} km.',
+      },
+      time: {
+        title: '{component} due {relativeDay}',
+        body: '{bike}: {component} is due {relativeDay}.',
+      },
+      lowConfidence: {
+        title: '{component} coming up',
+        body: '{bike}: {component} is due around {date}. Update your odometer for a better estimate.',
+      },
+    },
+    overdue: {
+      title: '{component} overdue',
+      body: '{bike}: {component} was due {overdueAmount} ago. A quick log takes 10 seconds.',
+    },
+    documentExpiry: {
+      title: '{docType} expires {relativeDay}',
+      body: '{bike}: renew before {date} to avoid penalties.',
+    },
+    relativeDay: {
+      today: 'today',
+      tomorrow: 'tomorrow',
+      inDays: 'in {days} days',
+    },
+    settings: {
+      title: 'Notification settings',
+      masterToggle: 'Reminders enabled',
+      fireTime: 'Reminder time',
+      quietHours: 'Quiet hours',
+      quietHoursCaption: 'Reminders due in this window move to your reminder time instead.',
+      types: {
+        maintenance_due: 'Maintenance due soon',
+        maintenance_overdue: 'Overdue nags',
+        document_expiry: 'Document expiry',
+        backup_reminder: 'Backup reminders',
+      },
+      permissionDenied: 'Notifications are turned off for Motrack in your device settings.',
+      openSystemSettings: 'Open system settings',
+    },
   },
 } as const;
 

@@ -1,6 +1,7 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { Icon, type IconName } from '@/components/Icon';
+import { PressableScale } from '@/components/PressableScale';
 import { strings } from '@/i18n/strings';
 import { makeStyles, typeStyle } from '@/theme/styles';
 import { useTheme } from '@/theme/useTheme';
@@ -28,7 +29,7 @@ const useStyles = makeStyles((t) =>
       gap: t.space.s2,
     },
     title: {
-      ...typeStyle(t.type.h2, t.text.primary),
+      ...typeStyle(t.type.h2, t.text.primary, t.type.family),
       paddingHorizontal: t.space.s1,
     },
     grid: {
@@ -40,12 +41,12 @@ const useStyles = makeStyles((t) =>
       alignItems: 'center',
       gap: t.space.s2,
       backgroundColor: t.bg.card,
-      borderRadius: t.radius.md,
+      borderRadius: t.radius.lg,
       borderWidth: StyleSheet.hairlineWidth,
       borderColor: t.border.divider,
       paddingVertical: t.space.s3,
       paddingHorizontal: t.space.s1,
-      minHeight: 88,
+      minHeight: 92,
       justifyContent: 'center',
     },
     iconWell: {
@@ -57,7 +58,7 @@ const useStyles = makeStyles((t) =>
       justifyContent: 'center',
     },
     label: {
-      ...typeStyle(t.type.caption, t.text.secondary),
+      ...typeStyle(t.type.caption, t.text.secondary, t.type.family),
       textAlign: 'center',
     },
   }),
@@ -74,21 +75,18 @@ export function QuickActionsGrid({ onAction }: QuickActionsGridProps) {
       </Text>
       <View style={styles.grid}>
         {ACTIONS.map((action) => (
-          <Pressable
+          <PressableScale
             key={action.id}
             onPress={() => onAction(action.id)}
+            scaleTo={0.95}
             accessibilityRole="button"
             accessibilityLabel={action.label}
-            style={({ pressed }) => [styles.tile, pressed && { opacity: 0.7 }]}>
+            style={styles.tile}>
             <View style={styles.iconWell}>
-              <Icon
-                name={action.icon}
-                size={tokens.iconSize.listLeading}
-                color={tokens.primary.base}
-              />
+              <Icon name={action.icon} size={tokens.iconSize.listLeading} color={tokens.primary.text} />
             </View>
             <Text style={styles.label}>{action.label}</Text>
-          </Pressable>
+          </PressableScale>
         ))}
       </View>
     </View>

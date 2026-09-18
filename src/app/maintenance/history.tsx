@@ -1,23 +1,18 @@
 import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { StyleSheet, Text } from 'react-native';
 
 import { EmptyState } from '@/components/EmptyState';
 import { Screen } from '@/components/Screen';
+import { ScreenHeader } from '@/components/ScreenHeader';
+import { SecondaryButton } from '@/components/SecondaryButton';
 import { TimelineItem } from '@/components/TimelineItem';
 import { componentIcon } from '@/features/maintenance/componentMeta';
 import { useActiveBike } from '@/hooks/useActiveBike';
 import { formatMoney, formatMonthDay } from '@/lib/format';
 import { loadTimeline } from '@/services/TimelineService';
-import { makeStyles, typeStyle } from '@/theme/styles';
-
-const useStyles = makeStyles((t) => ({
-  title: typeStyle(t.type.h1, t.text.primary),
-}));
 
 /** S-14 Maintenance history — reverse-chronological maintenance + repairs. */
 export default function MaintenanceHistoryRoute() {
-  const styles = useStyles();
   const router = useRouter();
   const { activeBike } = useActiveBike();
   const [offset, setOffset] = useState(0);
@@ -33,6 +28,7 @@ export default function MaintenanceHistoryRoute() {
   if (activeBike === null) {
     return (
       <Screen scroll={false}>
+        <ScreenHeader title="History" />
         <EmptyState icon="maintenance" title="No motorcycle yet" body="Add a motorcycle first." />
       </Screen>
     );
@@ -41,14 +37,21 @@ export default function MaintenanceHistoryRoute() {
   if (entries.length === 0 && offset === 0) {
     return (
       <Screen scroll={false}>
-        <EmptyState icon="maintenance" title="No history yet" body="Log a service to see it here." />
+        <ScreenHeader title="History" />
+        <EmptyState
+          icon="history"
+          title="No maintenance records yet"
+          body="Log a service and it will show up here, forming a searchable history over time."
+          ctaLabel="Log a service"
+          onCtaPress={() => router.push('/maintenance/log')}
+        />
       </Screen>
     );
   }
 
   return (
     <Screen>
-      <Text style={styles.title}>History</Text>
+      <ScreenHeader title="History" />
       {entries.map((entry) => (
         <TimelineItem
           key={entry.id}
@@ -69,13 +72,7 @@ export default function MaintenanceHistoryRoute() {
         />
       ))}
       {entries.length === 50 ? (
-        <TimelineItem
-          icon="maintenance"
-          title="Load more"
-          caption=""
-          amount=""
-          onPress={() => setOffset((o) => o + 50)}
-        />
+        <SecondaryButton label="Load more" onPress={() => setOffset((o) => o + 50)} block />
       ) : null}
     </Screen>
   );

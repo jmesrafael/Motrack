@@ -1,18 +1,19 @@
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
+import { ListSkeleton } from '@/components/Skeleton';
 import { Screen } from '@/components/Screen';
+import { ScreenHeader } from '@/components/ScreenHeader';
 import { SegmentedControl } from '@/components/SegmentedControl';
 import { StatCard } from '@/components/StatCard';
 import { useActiveBike } from '@/hooks/useActiveBike';
 import { formatKm, formatMoney } from '@/lib/format';
 import { useStatsStore } from '@/stores/useStatsStore';
-import { makeStyles, typeStyle } from '@/theme/styles';
+import { makeStyles } from '@/theme/styles';
 import { useFeatureTip } from '@/tutorial/hooks/useFeatureTip';
 
 const useStyles = makeStyles((t) =>
   StyleSheet.create({
-    title: typeStyle(t.type.h1, t.text.primary),
     grid: { flexDirection: 'row', flexWrap: 'wrap', gap: t.space.s3 },
     card: { width: '47%' },
   }),
@@ -39,46 +40,57 @@ export default function StatisticsRoute() {
   }, [scope, activeBike?.id]);
 
   if (status !== 'ready' || stats === null) {
-    return null;
+    return (
+      <Screen>
+        <ScreenHeader title="Statistics" />
+        <ListSkeleton rows={4} />
+      </Screen>
+    );
   }
 
   return (
     <Screen>
-      <Text style={styles.title}>Statistics</Text>
+      <ScreenHeader title="Statistics" />
       <SegmentedControl segments={SCOPE_SEGMENTS} value={scope} onChange={setScope} />
       <View style={styles.grid}>
         <View style={styles.card}>
-          <StatCard label="Km tracked" value={formatKm(stats.kmTracked)} />
+          <StatCard label="Km tracked" value={formatKm(stats.kmTracked)} icon="odometer" />
         </View>
         <View style={styles.card}>
-          <StatCard label="Overall spend" value={formatMoney(stats.overallSpendCentavos)} />
+          <StatCard label="Overall spend" value={formatMoney(stats.overallSpendCentavos)} icon="expense" />
         </View>
         <View style={styles.card}>
-          <StatCard label="Maintenance" value={formatMoney(stats.maintenanceSpendCentavos)} />
+          <StatCard label="Maintenance" value={formatMoney(stats.maintenanceSpendCentavos)} icon="maintenance" />
         </View>
         <View style={styles.card}>
-          <StatCard label="Fuel" value={formatMoney(stats.fuelSpendCentavos)} />
+          <StatCard label="Fuel" value={formatMoney(stats.fuelSpendCentavos)} icon="fuel" />
         </View>
         <View style={styles.card}>
-          <StatCard label="Repairs" value={formatMoney(stats.repairSpendCentavos)} />
+          <StatCard label="Repairs" value={formatMoney(stats.repairSpendCentavos)} icon="repair" />
         </View>
         <View style={styles.card}>
-          <StatCard label="Oil changes" value={String(stats.oilChangeCount)} />
+          <StatCard label="Oil changes" value={String(stats.oilChangeCount)} icon="engineOil" />
         </View>
         <View style={styles.card}>
           <StatCard
             label="Avg monthly spend"
             value={stats.averageMonthlySpendCentavos !== null ? formatMoney(stats.averageMonthlySpendCentavos) : '—'}
+            icon="trendingUp"
           />
         </View>
         <View style={styles.card}>
-          <StatCard label="Cost/km" value={stats.costPerKmCentavos !== null ? formatMoney(stats.costPerKmCentavos) : '—'} />
+          <StatCard
+            label="Cost/km"
+            value={stats.costPerKmCentavos !== null ? formatMoney(stats.costPerKmCentavos) : '—'}
+            icon="trendingUp"
+          />
         </View>
         {scope === 'bike' ? (
           <View style={styles.card}>
             <StatCard
               label="Avg consumption"
               value={stats.averageKmPerLiter !== null ? `${stats.averageKmPerLiter.toFixed(1)} km/L` : '—'}
+              icon="fuel"
             />
           </View>
         ) : null}

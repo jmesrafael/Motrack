@@ -10,6 +10,8 @@ export type PillStatus = 'excellent' | 'good' | 'dueSoon' | 'overdue' | 'critica
 export interface StatusPillProps {
   status: PillStatus;
   label: string;
+  /** Outline variant for use on tinted backgrounds (hero cards, chips row). */
+  variant?: 'solid' | 'outline';
 }
 
 /** Triple encoding: color + icon + text — never color alone (UI_UX_GUIDELINES.md §1.2). */
@@ -29,22 +31,49 @@ const useStyles = makeStyles((t) =>
       alignItems: 'center',
       gap: t.space.s1,
       borderRadius: t.radius.full,
-      paddingHorizontal: t.space.s2,
-      paddingVertical: t.space.s1,
+      paddingHorizontal: t.space.s3,
+      paddingVertical: 6,
     },
-    label: typeStyle(t.type.caption, t.text.primary),
+    dot: {
+      width: 6,
+      height: 6,
+      borderRadius: t.radius.full,
+    },
+    label: typeStyle(t.type.captionStrong, t.text.primary, t.type.family),
   }),
 );
 
-export function StatusPill({ status, label }: StatusPillProps) {
+export function StatusPill({ status, label, variant = 'solid' }: StatusPillProps) {
   const styles = useStyles();
   const { tokens } = useTheme();
   const color = tokens.status[status];
 
+  const containerStyle =
+    variant === 'solid'
+      ? { backgroundColor: color.bg }
+      : { backgroundColor: 'transparent', borderWidth: 1, borderColor: color.base };
+
   return (
-    <View style={[styles.pill, { backgroundColor: color.bg }]}>
+    <View style={[styles.pill, containerStyle]}>
       <Icon name={STATUS_ICONS[status]} size={tokens.iconSize.inline} color={color.base} />
-      <Text style={styles.label}>{label}</Text>
+      <Text style={[styles.label, { color: variant === 'solid' ? tokens.text.primary : color.base }]}>{label}</Text>
+    </View>
+  );
+}
+
+/** Small dot-only variant for tight chip rows (dashboard health chips). */
+export function StatusDotChip({ status, label }: { status: PillStatus; label: string }) {
+  const styles = useStyles();
+  const { tokens } = useTheme();
+  const color = tokens.status[status];
+  return (
+    <View
+      style={[
+        styles.pill,
+        { backgroundColor: tokens.bg.surfaceVariant, borderWidth: 1, borderColor: tokens.border.divider },
+      ]}>
+      <View style={[styles.dot, { backgroundColor: color.base }]} />
+      <Text style={[styles.label, { color: tokens.text.secondary }]}>{label}</Text>
     </View>
   );
 }

@@ -3,6 +3,8 @@
  * repairs, and notes. Repository LIKE queries, merged and date-sorted.
  */
 
+import { Platform } from 'react-native';
+
 import { rawDb } from '@/db/client';
 import { DocumentRepository } from '@/db/repositories/DocumentRepository';
 import { ExpenseRepository } from '@/db/repositories/ExpenseRepository';
@@ -32,7 +34,7 @@ const PER_SOURCE_LIMIT = 15;
 
 export function searchAll(query: string): SearchResult[] {
   const q = query.trim();
-  if (q.length < 2) {
+  if (q.length < 2 || Platform.OS === 'web') {
     return [];
   }
   const pattern = `%${q}%`;

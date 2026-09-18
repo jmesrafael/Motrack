@@ -6,7 +6,7 @@
 
 | If you are… | Read, in order |
 |---|---|
-| **Anyone, first session** | This file → [PRODUCT_DECISIONS.md](PRODUCT_DECISIONS.md) (current policy at a glance) → [DEVELOPMENT_RULES.md](DEVELOPMENT_RULES.md) (the constitution) → [GLOSSARY.md](GLOSSARY.md) |
+| **Anyone, first session** | This file → [PROGRESS.md](PROGRESS.md) (what's actually built vs. planned, right now) → [PRODUCT_DECISIONS.md](PRODUCT_DECISIONS.md) (current policy at a glance) → [DEVELOPMENT_RULES.md](DEVELOPMENT_RULES.md) (the constitution) → [GLOSSARY.md](GLOSSARY.md) |
 | **An AI implementer** | The three above → [AI_INSTRUCTIONS.md](AI_INSTRUCTIONS.md) (your protocol) → the docs owning your task area |
 | **Understanding the product** | [PROJECT_MISSION.md](PROJECT_MISSION.md) → [PRODUCT_VISION.md](PRODUCT_VISION.md) → [USER_PERSONAS.md](USER_PERSONAS.md) → [PRODUCT_REQUIREMENTS.md](PRODUCT_REQUIREMENTS.md) → [FEATURE_SPECIFICATIONS.md](FEATURE_SPECIFICATIONS.md) |
 | **Building a screen** | [SCREEN_SPECIFICATIONS.md](SCREEN_SPECIFICATIONS.md) → [USER_FLOWS.md](USER_FLOWS.md) → [COMPONENT_LIBRARY.md](COMPONENT_LIBRARY.md) → [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md)/[THEME_GUIDE.md](THEME_GUIDE.md)/[UI_UX_GUIDELINES.md](UI_UX_GUIDELINES.md) |
@@ -29,7 +29,7 @@
 
 **Governance:** [DEVELOPMENT_RULES.md](DEVELOPMENT_RULES.md) · [AI_INSTRUCTIONS.md](AI_INSTRUCTIONS.md) · [PRODUCT_DECISIONS.md](PRODUCT_DECISIONS.md) · [DECISION_LOG.md](DECISION_LOG.md) · [ACCEPTANCE_CRITERIA.md](ACCEPTANCE_CRITERIA.md) · [FINAL_CHECKLIST.md](FINAL_CHECKLIST.md) · [ARCHITECTURE_REVIEW.md](ARCHITECTURE_REVIEW.md)
 
-**Implementation planning:** [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) · [TASK_BREAKDOWN.md](TASK_BREAKDOWN.md) · [MILESTONES.md](MILESTONES.md) · [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md) · [IMPLEMENTATION_READINESS.md](IMPLEMENTATION_READINESS.md)
+**Implementation planning:** [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) · [TASK_BREAKDOWN.md](TASK_BREAKDOWN.md) · [MILESTONES.md](MILESTONES.md) · [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md) · [IMPLEMENTATION_READINESS.md](IMPLEMENTATION_READINESS.md) · [PROGRESS.md](PROGRESS.md) (live status — start here to know what's actually done)
 
 ## 3. Documentation standards (how these files stay trustworthy)
 

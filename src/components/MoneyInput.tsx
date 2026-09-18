@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { makeStyles, typeStyle } from '@/theme/styles';
@@ -14,14 +15,18 @@ const useStyles = makeStyles((t) =>
     row: {
       flexDirection: 'row',
       alignItems: 'center',
-      minHeight: 44,
-      borderRadius: t.radius.md,
-      borderWidth: StyleSheet.hairlineWidth,
-      borderColor: t.border.divider,
+      minHeight: t.size.input,
+      borderRadius: t.radius.sm,
+      borderWidth: 1.5,
+      borderColor: 'transparent',
       backgroundColor: t.bg.input,
-      paddingHorizontal: t.space.s3,
+      paddingHorizontal: t.space.s4,
     },
-    prefix: typeStyle(t.type.bodyStrong, t.text.secondary),
+    focused: {
+      borderColor: t.border.focus,
+      backgroundColor: t.bg.inputFocused,
+    },
+    prefix: typeStyle(t.type.bodyStrong, t.text.secondary, t.type.family),
     input: {
       flex: 1,
       marginLeft: t.space.s1,
@@ -36,8 +41,9 @@ const useStyles = makeStyles((t) =>
 export function MoneyInput({ value, onChange }: MoneyInputProps) {
   const styles = useStyles();
   const { tokens } = useTheme();
+  const [focused, setFocused] = useState(false);
   return (
-    <View style={styles.row}>
+    <View style={[styles.row, focused && styles.focused]}>
       <Text style={styles.prefix}>₱</Text>
       <TextInput
         style={styles.input}
@@ -47,6 +53,8 @@ export function MoneyInput({ value, onChange }: MoneyInputProps) {
         placeholder="0.00"
         placeholderTextColor={tokens.text.placeholder}
         accessibilityLabel="Amount, pesos"
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
       />
     </View>
   );

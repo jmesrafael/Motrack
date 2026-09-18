@@ -1,9 +1,10 @@
-import { createContext, useEffect, useMemo, useRef, type ReactNode } from 'react';
+import { createContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Animated, StyleSheet, useColorScheme } from 'react-native';
 
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useSettingsStore } from '@/stores/useSettingsStore';
 import { THEMES, isThemeId, type ThemeId, type ThemePreference } from './registry';
+import { consumeSkipNextThemeFade } from './themeTransition';
 import type { ThemeBase, ThemeTokens } from './types';
 
 export interface ThemeContextValue {
@@ -22,11 +23,10 @@ export interface ThemeProviderProps {
 }
 
 /**
- * Resolves preference → registered theme (THEME_GUIDE.md §2) and cross-dissolves
- * on change: an overlay in the outgoing theme's bg.page fades 1 → 0 over
- * motion.base while the new tokens render beneath (THEME_GUIDE.md §4).
- * Pure context swap — never keys/remounts the tree, so navigation, scroll,
- * and form state survive by construction.
+ * Resolves preference → registered theme and cross-dissolves on change: an
+ * overlay painted in the OUTGOING theme's page color fades out over
+ * motion.base while the new tokens render beneath. Pure context swap — never
+ * keys/remounts the tree, so navigation, scroll and form state survive.
  */
 export function ThemeProvider({ children }: ThemeProviderProps) {
   const systemScheme = useColorScheme();
@@ -38,9 +38,9 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   const themeId: ThemeId =
     preference !== 'system' && isThemeId(preference)
       ? preference
-      : systemScheme === 'dark'
-        ? 'dark'
-        : 'light';
+      : systemScheme === 'light'
+        ? 'light'
+        : 'dark';
 
   const definition = THEMES[themeId];
 
@@ -48,22 +48,27 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     themeId,
     pageColor: definition.tokens.bg.page,
   });
-  const fadeOpacity = useRef(new Animated.Value(0)).current;
-  const overlayColorRef = useRef(definition.tokens.bg.page);
+  const [fadeOpacity] = useState(() => new Animated.Value(0));
+  // State (not a ref) so the overlay color is read during render legally.
+  const [overlayColor, setOverlayColor] = useState(definition.tokens.bg.page);
 
   useEffect(() => {
     const previous = previousRef.current;
     if (previous.themeId !== themeId) {
-      overlayColorRef.current = previous.pageColor;
+      // The web circular-reveal toggle already animates this exact swap —
+      // skip our own fade so the two transitions don't run at once.
+      const skipFade = consumeSkipNextThemeFade();
+      setOverlayColor(previous.pageColor);
       previousRef.current = { themeId, pageColor: definition.tokens.bg.page };
-      if (!isReducedMotion) {
+      if (!isReducedMotion && !skipFade) {
         fadeOpacity.setValue(1);
         Animated.timing(fadeOpacity, {
           toValue: 0,
-          duration: definition.tokens.motion.base.durationMs,
-          // Opacity-only; JS driver keeps behavior identical across native + web.
+          duration: definition.tokens.motion.slow.durationMs,
           useNativeDriver: false,
         }).start();
+      } else {
+        fadeOpacity.setValue(0);
       }
     }
   }, [themeId, definition, fadeOpacity, isReducedMotion]);
@@ -84,10 +89,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
       {children}
       <Animated.View
         pointerEvents="none"
-        style={[
-          StyleSheet.absoluteFill,
-          { backgroundColor: overlayColorRef.current, opacity: fadeOpacity },
-        ]}
+        style={[StyleSheet.absoluteFill, { backgroundColor: overlayColor, opacity: fadeOpacity }]}
       />
     </ThemeContext.Provider>
   );

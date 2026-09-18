@@ -182,6 +182,21 @@ export const ScheduleService = {
     });
   },
 
+  /** Suppresses a schedule's notifications for 7 days (NOTIFICATION_ENGINE.md §6, S-05). */
+  snooze(scheduleId: string, snoozedUntil: string): Result<void> {
+    return guardService('schedule.snooze', () => {
+      const schedule = ScheduleRepository.getById(scheduleId);
+      if (schedule === undefined) {
+        return err(appError('BusinessRuleError', 'schedule.notFound', 'Schedule not found'));
+      }
+      inTransaction(() => {
+        ScheduleRepository.update(scheduleId, { snoozedUntil });
+      });
+      emitDomainEvent('schedule:changed', { bikeId: schedule.motorcycleId, scheduleId });
+      return ok(undefined);
+    });
+  },
+
   /**
    * Re-anchors from the schedule's latest record (BUSINESS_RULES.md §4): any
    * record re-anchors regardless of service type. Falls back to the previous

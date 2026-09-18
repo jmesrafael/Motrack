@@ -5,7 +5,9 @@ import { Text } from 'react-native';
 import { OdoInput } from '@/components/OdoInput';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { Screen } from '@/components/Screen';
+import { ScreenHeader } from '@/components/ScreenHeader';
 import { SecondaryButton } from '@/components/SecondaryButton';
+import { showToast } from '@/components/Toast';
 import { useActiveBike } from '@/hooks/useActiveBike';
 import { formatKm, formatMonthDay } from '@/lib/format';
 import { todayIso } from '@/lib/dates';
@@ -45,19 +47,21 @@ export default function OdometerUpdateRoute() {
       setShowMeterReplace(result.error.kind === 'ValidationError');
       return;
     }
+    showToast('Odometer updated');
     router.back();
   };
 
   const handleMeterReplace = () => {
     const result = OdometerService.replaceMeter(activeBike.id, Number(reading), todayIso());
     if (result.ok) {
+      showToast('Odometer updated');
       router.back();
     }
   };
 
   return (
     <Screen>
-      <Text style={styles.title}>Update odometer</Text>
+      <ScreenHeader title="Update odometer" />
       <Text style={styles.caption}>
         Current: {formatKm(activeBike.currentOdometerKm)} as of {formatMonthDay(todayIso())}
       </Text>
@@ -66,10 +70,7 @@ export default function OdometerUpdateRoute() {
       <PrimaryButton label="Save" onPress={handleSave} disabled={reading === ''} />
       {showMeterReplace ? (
         <>
-          <SecondaryButton
-            label="A past entry is wrong"
-            onPress={() => router.push('/odometer/log')}
-          />
+          <SecondaryButton label="A past entry is wrong" onPress={() => router.push('/odometer/log')} />
           <SecondaryButton label="The odometer/meter was replaced" onPress={handleMeterReplace} />
         </>
       ) : null}

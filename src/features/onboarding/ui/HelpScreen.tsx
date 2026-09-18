@@ -7,6 +7,8 @@ import { DestructiveButton } from '@/components/DestructiveButton';
 import { Icon } from '@/components/Icon';
 import { ListSection } from '@/components/ListSection';
 import { Screen } from '@/components/Screen';
+import { ScreenHeader } from '@/components/ScreenHeader';
+import { showToast } from '@/components/Toast';
 import { Toggle } from '@/components/Toggle';
 import { interpolate, strings } from '@/i18n/strings';
 import { useTutorialStore } from '@/stores/useTutorialStore';
@@ -85,7 +87,7 @@ export function HelpScreen() {
 
   return (
     <Screen>
-      <Text style={styles.title}>{strings.help.title}</Text>
+      <ScreenHeader title={strings.help.title} />
       <ListSection title={strings.help.toursSection}>
         {listTours().map((config) => {
           const status: TutorialStatus = tutorials[config.id]?.status ?? 'not_started';
@@ -138,6 +140,7 @@ export function HelpScreen() {
         onConfirm={() => {
           setConfirmingReset(false);
           resetAllProgress();
+          showToast({ kind: 'info', message: 'Tutorial progress reset' });
         }}
         onCancel={() => setConfirmingReset(false)}
       />

@@ -3,12 +3,13 @@ import { useState } from 'react';
 import { Text } from 'react-native';
 
 import { Screen } from '@/components/Screen';
+import { ScreenHeader } from '@/components/ScreenHeader';
+import { showToast } from '@/components/Toast';
 import { BikeForm, toMotorcycleInput, type BikeFormValues } from '@/features/garage/ui/BikeForm';
 import { MotorcycleService } from '@/services/MotorcycleService';
 import { makeStyles, typeStyle } from '@/theme/styles';
 
 const useStyles = makeStyles((t) => ({
-  title: typeStyle(t.type.h1, t.text.primary),
   error: typeStyle(t.type.caption, t.feedback.error.base),
 }));
 
@@ -30,12 +31,13 @@ export default function AddBikeRoute() {
       setFormError(result.error.message);
       return;
     }
+    showToast(`${result.value.nickname} added`);
     router.replace('/(tabs)');
   };
 
   return (
     <Screen>
-      <Text style={styles.title}>Add motorcycle</Text>
+      <ScreenHeader title="Add motorcycle" />
       {formError !== undefined ? <Text style={styles.error}>{formError}</Text> : null}
       <BikeForm submitLabel="Save" submitting={submitting} onSubmit={handleSubmit} fieldErrors={fieldErrors} />
     </Screen>

@@ -14,13 +14,13 @@ export interface FormFieldProps {
 const useStyles = makeStyles((t) =>
   StyleSheet.create({
     root: { gap: t.space.s1 },
-    label: typeStyle(t.type.label, t.text.secondary),
-    error: typeStyle(t.type.caption, t.feedback.error.base),
-    hint: typeStyle(t.type.caption, t.text.tertiary),
+    label: typeStyle(t.type.label, t.text.secondary, t.type.family),
+    error: typeStyle(t.type.caption, t.feedback.error.base, t.type.family),
+    hint: typeStyle(t.type.caption, t.text.tertiary, t.type.family),
   }),
 );
 
-/** Label-above wrapper; error text announced via accessibilityLiveRegion (COMPONENT_LIBRARY.md). */
+/** Label-above wrapper; error text announced via accessibilityLiveRegion. */
 export function FormField({ label, error, hint, required = false, children }: FormFieldProps) {
   const styles = useStyles();
   return (

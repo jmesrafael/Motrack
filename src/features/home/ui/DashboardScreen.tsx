@@ -4,7 +4,6 @@ import { useCallback, useEffect } from 'react';
 import { AppHeader } from '@/components/AppHeader';
 import { EmptyState } from '@/components/EmptyState';
 import { ListSection } from '@/components/ListSection';
-import { PrimaryButton } from '@/components/PrimaryButton';
 import { ScheduleRow } from '@/components/ScheduleRow';
 import { Screen } from '@/components/Screen';
 import { TimelineItem } from '@/components/TimelineItem';
@@ -52,13 +51,14 @@ export function DashboardScreen() {
 
   if (!vm.hasBike || vm.data === null) {
     return (
-      <Screen scroll={false}>
+      <Screen scroll={false} withTabBarInset>
         <EmptyState
           icon="motorcycle"
           title="Add your first motorcycle"
-          body="Motrack tracks maintenance, fuel, and expenses per bike — add one to get started."
+          body="Motrack tracks maintenance, fuel, and expenses per bike. Add one to get started."
+          ctaLabel="Add motorcycle"
+          onCtaPress={() => router.push('/bike/new')}
         />
-        <PrimaryButton label="Add motorcycle" onPress={() => router.push('/bike/new')} />
       </Screen>
     );
   }
@@ -66,7 +66,7 @@ export function DashboardScreen() {
   const { bike } = vm.data;
 
   return (
-    <Screen tutorialScrollId="dashboard">
+    <Screen tutorialScrollId="dashboard" withTabBarInset>
       <AppHeader
         bikeLabel={bike.nickname}
         bikeA11yLabel={`${bike.nickname}, ${bike.brand} ${bike.model}. ${strings.dashboard.bikeChipA11y}`}

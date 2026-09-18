@@ -160,8 +160,7 @@ export function SpotlightOverlay({
 
   return (
     <Animated.View
-      style={[StyleSheet.absoluteFill, rootStyle]}
-      pointerEvents={blocking ? 'box-none' : 'none'}>
+      style={[StyleSheet.absoluteFill, rootStyle, { pointerEvents: blocking ? 'box-none' : 'none' }]}>
       <Svg width={windowWidth} height={windowHeight} pointerEvents="none">
         <Mask id="tutorial-spotlight">
           <Rect x={0} y={0} width={windowWidth} height={windowHeight} fill="#fff" />

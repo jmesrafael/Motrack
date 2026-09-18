@@ -43,15 +43,15 @@ export default function MoneyRoute() {
 
   if (activeBike === null) {
     return (
-      <Screen scroll={false}>
+      <Screen scroll={false} withTabBarInset>
         <EmptyState icon="expense" title="No motorcycle yet" body="Add a motorcycle to track spending." />
       </Screen>
     );
   }
 
   return (
-    <Screen>
-      <Text style={styles.title}>Money</Text>
+    <Screen withTabBarInset>
+      <Text style={styles.title}>Expense</Text>
       <SegmentedControl segments={SEGMENTS} value={segment} onChange={setSegment} />
       {segment === 'expenses' ? (
         <>

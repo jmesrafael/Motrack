@@ -32,7 +32,7 @@ export default function MaintenanceRoute() {
 
   if (activeBike === null) {
     return (
-      <Screen scroll={false}>
+      <Screen scroll={false} withTabBarInset>
         <EmptyState icon="maintenance" title="No motorcycle yet" body="Add a motorcycle to track its maintenance." />
       </Screen>
     );
@@ -45,7 +45,7 @@ export default function MaintenanceRoute() {
   const dueSoonCount = enabled.filter((i) => i.status.status === 'dueSoon').length;
 
   return (
-    <Screen tutorialScrollId="maintenance">
+    <Screen tutorialScrollId="maintenance" withTabBarInset>
       <Text style={styles.title}>Maintenance</Text>
       <Text style={styles.summary}>
         {overdueCount} overdue · {dueSoonCount} due soon

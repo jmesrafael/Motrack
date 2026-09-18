@@ -1,6 +1,7 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { Icon, type IconName } from '@/components/Icon';
+import { PressableScale } from '@/components/PressableScale';
 import { makeStyles, typeStyle } from '@/theme/styles';
 import { useTheme } from '@/theme/useTheme';
 
@@ -9,7 +10,7 @@ export interface TimelineItemProps {
   title: string;
   caption: string;
   amount: string;
-  /** Repairs render visually distinct: icon + accent edge (COMPONENT_LIBRARY.md). */
+  /** Repairs render visually distinct: icon + accent edge. */
   isRepair?: boolean;
   onPress: () => void;
 }
@@ -20,14 +21,14 @@ const useStyles = makeStyles((t) =>
       flexDirection: 'row',
       alignItems: 'center',
       gap: t.space.s3,
-      minHeight: 56,
+      minHeight: t.size.row,
       paddingHorizontal: t.space.s4,
       paddingVertical: t.space.s3,
     },
     iconWell: {
-      width: 36,
-      height: 36,
-      borderRadius: t.radius.full,
+      width: t.size.iconWell,
+      height: t.size.iconWell,
+      borderRadius: t.radius.md,
       backgroundColor: t.bg.surfaceVariant,
       alignItems: 'center',
       justifyContent: 'center',
@@ -40,44 +41,35 @@ const useStyles = makeStyles((t) =>
       flex: 1,
       gap: 2,
     },
-    title: typeStyle(t.type.bodyStrong, t.text.primary),
-    caption: typeStyle(t.type.caption, t.text.secondary),
+    title: typeStyle(t.type.bodyStrong, t.text.primary, t.type.family),
+    caption: typeStyle(t.type.caption, t.text.secondary, t.type.family),
     amount: {
-      ...typeStyle(t.type.bodyStrong, t.text.primary),
+      ...typeStyle(t.type.bodyStrong, t.text.primary, t.type.family),
       fontVariant: ['tabular-nums'],
     },
   }),
 );
 
-export function TimelineItem({
-  icon,
-  title,
-  caption,
-  amount,
-  isRepair = false,
-  onPress,
-}: TimelineItemProps) {
+export function TimelineItem({ icon, title, caption, amount, isRepair = false, onPress }: TimelineItemProps) {
   const styles = useStyles();
   const { tokens } = useTheme();
 
   return (
-    <Pressable
+    <PressableScale
       onPress={onPress}
+      dim
+      scaleTo={0.99}
       accessibilityRole="button"
       accessibilityLabel={`${title}, ${caption}, ${amount}`}
-      style={({ pressed }) => [styles.row, isRepair && styles.repairEdge, pressed && { opacity: 0.7 }]}>
+      style={[styles.row, isRepair && styles.repairEdge]}>
       <View style={styles.iconWell}>
-        <Icon
-          name={icon}
-          size={tokens.iconSize.listLeading}
-          {...(isRepair ? { color: tokens.accent } : {})}
-        />
+        <Icon name={icon} size={tokens.iconSize.listLeading} {...(isRepair ? { color: tokens.accent } : {})} />
       </View>
       <View style={styles.body}>
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.caption}>{caption}</Text>
       </View>
-      <Text style={styles.amount}>{amount}</Text>
-    </Pressable>
+      {amount !== '' ? <Text style={styles.amount}>{amount}</Text> : null}
+    </PressableScale>
   );
 }

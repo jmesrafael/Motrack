@@ -1,8 +1,7 @@
 /**
  * ThemeTokens contract — every registered theme must satisfy it completely
- * (THEME_GUIDE.md §2). Token names/values are owned by DESIGN_SYSTEM.md.
- * All values stay serializable (plain values, no functions) for the
- * Phase-3 token JSON export (DESIGN_SYSTEM.md §7).
+ * (THEME_GUIDE.md §2). Brand values come from brand.ts; themes only decide how
+ * the brand maps onto a light or dark base. All values stay serializable.
  */
 
 export type ThemeBase = 'light' | 'dark';
@@ -21,6 +20,18 @@ export interface SurfaceTokens {
   sheet: string;
   nav: string;
   input: string;
+  /** Focused input fill. */
+  inputFocused: string;
+}
+
+export interface GlassTokens {
+  /** Translucent fill layered over content (nav, sheets, floating cards). */
+  fill: string;
+  /** Slightly denser variant for cards that sit on busy content. */
+  fillStrong: string;
+  border: string;
+  /** Top-edge highlight that sells the material without a blur pass. */
+  highlight: string;
 }
 
 export interface TextColorTokens {
@@ -29,6 +40,9 @@ export interface TextColorTokens {
   tertiary: string;
   placeholder: string;
   disabled: string;
+  /** Text/icon on top of primary.base (buttons, hero). */
+  onAccent: string;
+  onAccentSoft: string;
 }
 
 export interface IconColorTokens {
@@ -39,17 +53,28 @@ export interface IconColorTokens {
 export interface BorderTokens {
   divider: string;
   strong: string;
+  /** Accent outline for focused inputs and selected controls. */
+  focus: string;
 }
 
 export interface OverlayTokens {
   scrim: string;
+  /** Softer scrim for bottom sheets so context stays visible. */
+  scrimSoft: string;
 }
 
 export interface PrimaryTokens {
+  /** Fill color (buttons, FAB, hero card). */
   base: string;
   pressed: string;
+  /** Tint wash (icon wells, selected rows). */
   bg: string;
+  /** Ink on top of base. */
   on: string;
+  /** Accent usable as text/icon on regular surfaces (contrast-safe per base). */
+  text: string;
+  /** Glow color for elevated accent surfaces. */
+  glow: string;
 }
 
 export interface PremiumTokens {
@@ -60,6 +85,9 @@ export interface PremiumTokens {
 
 export interface StateTokens {
   disabledBg: string;
+  disabledText: string;
+  /** Press wash for list rows / cards. */
+  pressed: string;
 }
 
 export interface FeedbackTokens {
@@ -107,7 +135,7 @@ export interface ChartTokens {
   grid: string;
 }
 
-export type TypeWeight = '400' | '600' | '700';
+export type TypeWeight = '400' | '500' | '600' | '700' | '800';
 
 export interface TypeToken {
   fontSize: number;
@@ -117,17 +145,34 @@ export interface TypeToken {
   uppercase?: boolean;
 }
 
+export interface FontFamilyTokens {
+  regular: string;
+  medium: string;
+  semibold: string;
+  bold: string;
+  extrabold: string;
+}
+
 export interface TypeTokens {
+  /** Registered font family per weight; null = platform system font. */
+  family: FontFamilyTokens | null;
+  /** Big statement headline (dashboard hero, onboarding). */
+  hero: TypeToken;
+  /** Oversized numerals (health score, odometer). */
+  stat: TypeToken;
   display: TypeToken;
   h1: TypeToken;
   h2: TypeToken;
+  h3: TypeToken;
   body: TypeToken;
   bodyStrong: TypeToken;
   caption: TypeToken;
+  captionStrong: TypeToken;
+  /** Uppercase eyebrow label ("HEALTH SCORE"). */
   label: TypeToken;
 }
 
-/** 4-pt spacing scale (DESIGN_SYSTEM.md §5). Screen gutter = s4. */
+/** 4-pt spacing scale (DESIGN_SYSTEM.md §5). Screen gutter = s5. */
 export interface SpaceTokens {
   s1: number;
   s2: number;
@@ -137,16 +182,21 @@ export interface SpaceTokens {
   s6: number;
   s8: number;
   s10: number;
+  s12: number;
+  /** Horizontal screen gutter. */
+  gutter: number;
 }
 
 export interface RadiusTokens {
+  xs: number;
   sm: number;
   md: number;
   lg: number;
+  xl: number;
   full: number;
 }
 
-/** Serializable shadow fragment; dark bases use surface steps instead (DESIGN_SYSTEM.md §5). */
+/** Serializable shadow fragment. */
 export interface ShadowToken {
   shadowColor: string;
   shadowOffset: { width: number; height: number };
@@ -156,31 +206,53 @@ export interface ShadowToken {
 }
 
 export interface ElevationTokens {
-  /** The only shadow in the system — sheets/raised action surfaces on light bases. */
+  /** Cards on light bases; null on dark (surface steps instead). */
+  card: ShadowToken | null;
+  /** Sheets, dialogs, toasts. */
   sheet: ShadowToken | null;
+  /** Accent glow under the FAB / hero. */
+  accent: ShadowToken;
 }
 
-/** Motion token values are owned by ANIMATION_GUIDE.md §2; carried per theme. */
 export interface MotionToken {
   durationMs: number;
 }
 
 export interface MotionTokens {
+  /** Press feedback, toggles. */
   fast: MotionToken;
+  /** Most transitions. */
   base: MotionToken;
+  /** Rings, celebrations, page enters. */
   slow: MotionToken;
+  /** Scale applied on press by PressableScale. */
+  pressScale: number;
+  /** Spring config shared by pop-ins. */
+  spring: { damping: number; stiffness: number; mass: number };
 }
 
-/** Icon sizes are owned by ICON_GUIDE.md §2; carried per theme. */
 export interface IconSizeTokens {
   inline: number;
   listLeading: number;
   md: number;
   feature: number;
+  hero: number;
+}
+
+export interface ComponentSizeTokens {
+  buttonLg: number;
+  buttonMd: number;
+  input: number;
+  row: number;
+  fab: number;
+  navHeight: number;
+  iconWell: number;
+  iconWellSm: number;
 }
 
 export interface ThemeTokens {
   bg: SurfaceTokens;
+  glass: GlassTokens;
   text: TextColorTokens;
   icon: IconColorTokens;
   border: BorderTokens;
@@ -201,6 +273,7 @@ export interface ThemeTokens {
   elevation: ElevationTokens;
   motion: MotionTokens;
   iconSize: IconSizeTokens;
+  size: ComponentSizeTokens;
 }
 
 export interface ThemeDefinition {

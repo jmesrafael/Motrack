@@ -118,12 +118,18 @@ export async function scrollAnchorIntoView(id: string, reduceMotion: boolean): P
     return;
   }
   const contentY = await new Promise<number | null>((resolve) => {
-    const inner = scrollView.getInnerViewNode() as unknown as View;
-    view.measureLayout(
-      inner,
-      (_x, y) => resolve(y),
-      () => resolve(null),
-    );
+    try {
+      const inner = scrollView.getInnerViewNode() as unknown as View;
+      view.measureLayout(
+        inner,
+        (_x, y) => resolve(y),
+        () => resolve(null),
+      );
+    } catch {
+      // Some platforms' ScrollView doesn't implement this native measure
+      // API — skip the scroll rather than let the rejection stall the step.
+      resolve(null);
+    }
   });
   if (contentY === null) {
     return;

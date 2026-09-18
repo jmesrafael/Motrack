@@ -1,16 +1,21 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { StyleSheet, Text } from 'react-native';
+import { Text } from 'react-native';
 
+import { CompletionOverlay } from '@/components/CompletionOverlay';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { DateField } from '@/components/DateField';
+import { DestructiveButton } from '@/components/DestructiveButton';
 import { FormField } from '@/components/FormField';
 import { MoneyInput } from '@/components/MoneyInput';
 import { OdoInput } from '@/components/OdoInput';
 import { PickerField } from '@/components/PickerField';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { Screen } from '@/components/Screen';
+import { ScreenHeader } from '@/components/ScreenHeader';
 import { SegmentedControl } from '@/components/SegmentedControl';
 import { TextField } from '@/components/TextField';
+import { showToast } from '@/components/Toast';
 import { MaintenanceRepository } from '@/db/repositories/MaintenanceRepository';
 import { ScheduleRepository } from '@/db/repositories/ScheduleRepository';
 import { componentLabel } from '@/features/maintenance/componentMeta';
@@ -70,6 +75,8 @@ export default function MaintenanceLogRoute() {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>();
   const [formError, setFormError] = useState<string>();
   const [submitting, setSubmitting] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [showCompletion, setShowCompletion] = useState(false);
 
   if (bikeId === null) {
     return (
@@ -98,29 +105,37 @@ export default function MaintenanceLogRoute() {
       notes: notes !== '' ? notes : null,
       photoPath: null,
     };
-    const result =
-      existingRecord !== undefined
-        ? MaintenanceService.editRecord(existingRecord.id, input)
-        : MaintenanceService.saveRecord(bikeId, input);
+    const isNew = existingRecord === undefined;
+    const result = isNew
+      ? MaintenanceService.saveRecord(bikeId, input)
+      : MaintenanceService.editRecord(existingRecord.id, input);
     setSubmitting(false);
     if (!result.ok) {
       setFieldErrors(result.error.fieldErrors);
       setFormError(result.error.message);
       return;
     }
-    router.back();
+    if (isNew) {
+      // Form → saved-state transition: a brief celebration before handing back.
+      setShowCompletion(true);
+    } else {
+      showToast('Maintenance updated');
+      router.back();
+    }
   };
 
   const handleDelete = () => {
+    setConfirmingDelete(false);
     if (existingRecord !== undefined) {
       MaintenanceService.deleteRecord(existingRecord.id);
+      showToast({ kind: 'info', message: 'Record deleted' });
       router.back();
     }
   };
 
   return (
     <Screen>
-      <Text style={styles.title}>{existingRecord !== undefined ? 'Edit record' : 'Log maintenance'}</Text>
+      <ScreenHeader title={existingRecord !== undefined ? 'Edit record' : 'Log maintenance'} />
       {formError !== undefined ? <Text style={styles.error}>{formError}</Text> : null}
       <FormField label="Component" required error={fieldErrors?.scheduleId}>
         <PickerField
@@ -156,7 +171,26 @@ export default function MaintenanceLogRoute() {
         loading={submitting}
         onPress={handleSubmit}
       />
-      {existingRecord !== undefined ? <PrimaryButton label="Delete" onPress={handleDelete} /> : null}
+      {existingRecord !== undefined ? (
+        <DestructiveButton label="Delete record" onPress={() => setConfirmingDelete(true)} />
+      ) : null}
+      <ConfirmDialog
+        visible={confirmingDelete}
+        title="Delete maintenance record?"
+        body="This removes the logged service and its cost from this component's history. This can be recovered for 30 days."
+        confirmLabel="Delete record"
+        onConfirm={handleDelete}
+        onCancel={() => setConfirmingDelete(false)}
+      />
+      <CompletionOverlay
+        visible={showCompletion}
+        message="Maintenance saved"
+        onDone={() => {
+          setShowCompletion(false);
+          showToast('Maintenance saved');
+          router.back();
+        }}
+      />
     </Screen>
   );
 }

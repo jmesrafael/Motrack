@@ -37,7 +37,7 @@ export const DocumentService = {
       } catch {
         log.error('document.import.fileError');
         return err(
-          appError('FileError', 'document.copyFailed', 'Could not store the file — check free space'),
+          appError('FileError', 'document.copyFailed', 'Could not store the file. Check free space.'),
         );
       }
       const result = runTx(() =>

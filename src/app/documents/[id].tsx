@@ -4,6 +4,8 @@ import { Image, Text } from 'react-native';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { DestructiveButton } from '@/components/DestructiveButton';
 import { Screen } from '@/components/Screen';
+import { ScreenHeader } from '@/components/ScreenHeader';
+import { showToast } from '@/components/Toast';
 import { DocumentRepository } from '@/db/repositories/DocumentRepository';
 import { strings } from '@/i18n/strings';
 import { DocumentService } from '@/services/DocumentService';
@@ -28,7 +30,7 @@ export default function DocumentDetailRoute() {
   if (doc === undefined) {
     return (
       <Screen>
-        <Text style={styles.title}>Document not found</Text>
+        <ScreenHeader title="Document not found" />
       </Screen>
     );
   }
@@ -39,12 +41,13 @@ export default function DocumentDetailRoute() {
   const handleDelete = () => {
     setConfirmingDelete(false);
     DocumentService.deleteDocument(doc.id);
+    showToast({ kind: 'info', message: 'Document deleted' });
     router.back();
   };
 
   return (
     <Screen>
-      <Text style={styles.title}>{doc.title}</Text>
+      <ScreenHeader title={doc.title} />
       <Text style={styles.caption}>{strings.docTypes[doc.docType as DocType]}</Text>
       {doc.expiryDate !== null ? <Text style={styles.caption}>Expires {doc.expiryDate}</Text> : null}
       {isImage ? <Image source={{ uri }} style={styles.image} resizeMode="contain" /> : null}

@@ -74,7 +74,7 @@ function ChoiceDialog({
           <Text style={styles.body}>{body}</Text>
           <View style={styles.actions}>
             <PrimaryButton label={primaryLabel} onPress={onPrimary} />
-            <SecondaryButton label={secondaryLabel} onPress={onSecondary} />
+            <SecondaryButton label={secondaryLabel} onPress={onSecondary} block />
             <Pressable
               onPress={onTertiary}
               accessibilityRole="button"

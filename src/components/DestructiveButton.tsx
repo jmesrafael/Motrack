@@ -1,39 +1,13 @@
-import { Pressable, StyleSheet, Text } from 'react-native';
-
-import { makeStyles, typeStyle } from '@/theme/styles';
+import { Button, type ButtonSize } from '@/components/Button';
 
 export interface DestructiveButtonProps {
   label: string;
   onPress: () => void;
   disabled?: boolean;
+  size?: ButtonSize;
 }
 
-const useStyles = makeStyles((t) =>
-  StyleSheet.create({
-    button: {
-      minHeight: 44,
-      paddingHorizontal: t.space.s4,
-      borderRadius: t.radius.full,
-      borderWidth: 1,
-      borderColor: t.feedback.error.base,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    disabled: { opacity: 0.5 },
-    label: typeStyle(t.type.bodyStrong, t.feedback.error.base),
-  }),
-);
-
-export function DestructiveButton({ label, onPress, disabled = false }: DestructiveButtonProps) {
-  const styles = useStyles();
-  return (
-    <Pressable
-      onPress={onPress}
-      disabled={disabled}
-      accessibilityRole="button"
-      accessibilityLabel={label}
-      style={({ pressed }) => [styles.button, disabled && styles.disabled, pressed && !disabled && { opacity: 0.7 }]}>
-      <Text style={styles.label}>{label}</Text>
-    </Pressable>
-  );
+/** Compatibility wrapper — irreversible actions (see Button). */
+export function DestructiveButton({ label, onPress, disabled = false, size = 'md' }: DestructiveButtonProps) {
+  return <Button label={label} onPress={onPress} disabled={disabled} variant="destructive" size={size} block />;
 }

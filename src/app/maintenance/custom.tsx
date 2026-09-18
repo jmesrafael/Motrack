@@ -5,7 +5,9 @@ import { Text } from 'react-native';
 import { FormField } from '@/components/FormField';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { Screen } from '@/components/Screen';
+import { ScreenHeader } from '@/components/ScreenHeader';
 import { TextField } from '@/components/TextField';
+import { showToast } from '@/components/Toast';
 import { useActiveBike } from '@/hooks/useActiveBike';
 import { ScheduleService } from '@/services/ScheduleService';
 import { makeStyles, typeStyle } from '@/theme/styles';
@@ -43,12 +45,13 @@ export default function AddCustomComponentRoute() {
       setError(result.error.message);
       return;
     }
+    showToast('Component added');
     router.back();
   };
 
   return (
     <Screen>
-      <Text style={styles.title}>Custom component</Text>
+      <ScreenHeader title="Custom component" />
       {error !== undefined ? <Text style={styles.error}>{error}</Text> : null}
       <FormField label="Name" required>
         <TextField value={name} onChangeText={setName} maxLength={30} placeholder="e.g. Handlebar grips" />

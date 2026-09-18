@@ -25,15 +25,18 @@ interface SettingsState {
  * The only persisted store — mirrored to SQLite `app_settings`, never
  * AsyncStorage (STATE_MANAGEMENT.md §5).
  */
+/** App default is dark, independent of OS setting — "System default" remains a choice in Settings. */
+const DEFAULT_THEME_PREFERENCE: ThemePreference = 'dark';
+
 export const useSettingsStore = create<SettingsState>((set, get) => ({
-  themePreference: 'system',
+  themePreference: DEFAULT_THEME_PREFERENCE,
   language: 'system',
   hydrated: false,
   hydrate: () => {
-    const theme = SettingsRepository.get<ThemePreference>(THEME_KEY, 'system');
+    const theme = SettingsRepository.get<ThemePreference>(THEME_KEY, DEFAULT_THEME_PREFERENCE);
     const language = SettingsRepository.get<LanguagePreference>(LANGUAGE_KEY, 'system');
     set({
-      themePreference: THEME_PREFERENCES.includes(theme) ? theme : 'system',
+      themePreference: THEME_PREFERENCES.includes(theme) ? theme : DEFAULT_THEME_PREFERENCE,
       language,
       hydrated: true,
     });
