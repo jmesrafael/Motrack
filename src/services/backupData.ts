@@ -6,11 +6,31 @@
 
 import { BACKUP_TABLE_SCHEMAS, type BackupData, type BackupTableName } from './validation/backupSchemas';
 
+/** Adds every string found in a JSON-array-of-strings column; malformed JSON in an existing row is not this function's problem to fix. */
+function addJsonPathArray(paths: Set<string>, json: string | null): void {
+  if (json === null) {
+    return;
+  }
+  try {
+    const parsed: unknown = JSON.parse(json);
+    if (Array.isArray(parsed)) {
+      for (const p of parsed) {
+        if (typeof p === 'string') {
+          paths.add(p);
+        }
+      }
+    }
+  } catch {
+    // ignore
+  }
+}
+
 /** Photo/document relative paths referenced by the data set (for packing + restore verification). */
 export function collectReferencedFilePaths(data: BackupData): string[] {
   const paths = new Set<string>();
   for (const doc of data.documents) {
     paths.add(doc.file_path);
+    addJsonPathArray(paths, doc.extra_files);
   }
   for (const bike of data.motorcycles) {
     if (bike.photo_path !== null) {
@@ -23,25 +43,18 @@ export function collectReferencedFilePaths(data: BackupData): string[] {
     }
   }
   for (const expense of data.expenses) {
-    if (expense.photo_path !== null) {
-      paths.add(expense.photo_path);
-    }
+    addJsonPathArray(paths, expense.images);
   }
   for (const repair of data.repairs) {
-    if (repair.photo_paths !== null) {
-      try {
-        const parsed: unknown = JSON.parse(repair.photo_paths);
-        if (Array.isArray(parsed)) {
-          for (const p of parsed) {
-            if (typeof p === 'string') {
-              paths.add(p);
-            }
-          }
-        }
-      } catch {
-        // Malformed JSON in an existing row is not this function's problem to fix.
-      }
+    addJsonPathArray(paths, repair.photo_paths);
+  }
+  for (const build of data.builds) {
+    if (build.cover_photo !== null) {
+      paths.add(build.cover_photo);
     }
+  }
+  for (const planItem of data.build_plan_items) {
+    addJsonPathArray(paths, planItem.photos);
   }
   return [...paths];
 }

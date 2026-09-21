@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { Card } from '@/components/Card';
+import { IconButton } from '@/components/IconButton';
 import { OdoInput } from '@/components/OdoInput';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { Screen } from '@/components/Screen';
@@ -11,6 +12,7 @@ import { SecondaryButton } from '@/components/SecondaryButton';
 import { StatusPill } from '@/components/StatusPill';
 import { TimelineItem } from '@/components/TimelineItem';
 import { showToast } from '@/components/Toast';
+import { ExpenseRepository } from '@/db/repositories/ExpenseRepository';
 import { MaintenanceRepository } from '@/db/repositories/MaintenanceRepository';
 import { MotorcycleRepository } from '@/db/repositories/MotorcycleRepository';
 import { ScheduleRepository } from '@/db/repositories/ScheduleRepository';
@@ -18,7 +20,7 @@ import { componentIcon, componentLabel } from '@/features/maintenance/componentM
 import { formatRemaining } from '@/features/maintenance/remainingText';
 import { strings } from '@/i18n/strings';
 import { todayIso } from '@/lib/dates';
-import { formatMoney, formatMonthDay } from '@/lib/format';
+import { formatCategoryName, formatMoney, formatMonthDay } from '@/lib/format';
 import { ScheduleService } from '@/services/ScheduleService';
 import { computeScheduleStatus } from '@/services/StatusService';
 import { makeStyles, typeStyle } from '@/theme/styles';
@@ -62,6 +64,11 @@ export default function ComponentDetailRoute() {
     [schedule, id, refreshKey],
   );
 
+  const expenses = useMemo(
+    () => (schedule !== undefined ? ExpenseRepository.listBySchedule(id) : []),
+    [schedule, id, refreshKey],
+  );
+
   if (schedule === undefined || bike === undefined || status === null) {
     return (
       <Screen>
@@ -85,9 +92,27 @@ export default function ComponentDetailRoute() {
     }
   };
 
+  const togglePinned = () => {
+    const result = ScheduleService.setPinned(id, schedule.isPinned !== 1);
+    if (result.ok) {
+      setRefreshKey((k) => k + 1);
+      showToast(schedule.isPinned === 1 ? 'Removed from Quick Logs' : 'Added to Quick Logs');
+    }
+  };
+
   return (
     <Screen>
-      <ScreenHeader title={label} />
+      <ScreenHeader
+        title={label}
+        trailing={
+          <IconButton
+            icon={schedule.isPinned === 1 ? 'checkCircle' : 'plus'}
+            variant={schedule.isPinned === 1 ? 'accent' : 'surface'}
+            accessibilityLabel={schedule.isPinned === 1 ? 'Remove from Quick Logs' : 'Add to Quick Logs'}
+            onPress={togglePinned}
+          />
+        }
+      />
       <Card>
         <View style={styles.row}>
           <StatusPill status={status.status} label={strings.dashboard.nextMaintenance.due[status.status]} />
@@ -102,7 +127,7 @@ export default function ComponentDetailRoute() {
 
       {status.anchored === false ? (
         <Card>
-          <Text style={styles.caption}>Not set up — when was this last done?</Text>
+          <Text style={styles.caption}>Not set up yet. When was this last done?</Text>
           <View style={styles.baselineRow}>
             <OdoInput value={baselineOdo} onChange={setBaselineOdo} />
             <PrimaryButton label="Save baseline" onPress={handleBaseline} />
@@ -146,10 +171,34 @@ export default function ComponentDetailRoute() {
               ? `${formatMonthDay(record.performedDate)} · ${record.odometerKm.toLocaleString('en-PH')} km`
               : formatMonthDay(record.performedDate)
           }
-          amount={record.costCentavos !== null ? formatMoney(record.costCentavos) : '—'}
+          amount={record.costCentavos !== null ? formatMoney(record.costCentavos) : '-'}
           onPress={() => router.push(`/maintenance/log?recordId=${record.id}`)}
         />
       ))}
+
+      <View style={styles.row}>
+        <Text style={styles.sectionTitle}>Expense logs</Text>
+        <IconButton
+          icon="plus"
+          variant="surface"
+          accessibilityLabel="Add expense for this component"
+          onPress={() => router.push(`/expense/log?scheduleId=${id}` as never)}
+        />
+      </View>
+      {expenses.length === 0 ? (
+        <Text style={styles.caption}>No expenses logged for this component yet.</Text>
+      ) : (
+        expenses.map((expense) => (
+          <TimelineItem
+            key={expense.id}
+            icon={componentIcon(componentType)}
+            title={formatCategoryName(expense.category)}
+            caption={formatMonthDay(expense.expenseDate)}
+            amount={formatMoney(expense.amountCentavos)}
+            onPress={() => router.push(`/expense/log?expenseId=${expense.id}` as never)}
+          />
+        ))
+      )}
     </Screen>
   );
 }

@@ -116,6 +116,7 @@ export const ScheduleService = {
           intervalKm: parsed.value.intervalKm,
           intervalMonths: parsed.value.intervalMonths,
           isEnabled: 1,
+          sortOrder: ScheduleRepository.nextCustomSortOrder(motorcycleId),
         }),
       );
       emitDomainEvent('schedule:changed', { bikeId: motorcycleId, scheduleId: row.id });
@@ -139,6 +140,75 @@ export const ScheduleService = {
         ScheduleRepository.softDelete(scheduleId);
       });
       emitDomainEvent('schedule:changed', { bikeId: schedule.motorcycleId, scheduleId });
+      return ok(undefined);
+    });
+  },
+
+  /**
+   * Batch-deletes several custom components in one transaction (item 13).
+   * Soft delete only — maintenance history rows keep referencing the
+   * (now-hidden) schedule via ON DELETE RESTRICT, so nothing historical is
+   * ever silently lost; the UI confirmation is what explains this to the user
+   * before calling here.
+   */
+  deleteCustomComponents(scheduleIds: readonly string[]): Result<void> {
+    return guardService('schedule.deleteCustomBatch', () => {
+      let bikeId: string | undefined;
+      inTransaction(() => {
+        for (const scheduleId of scheduleIds) {
+          const schedule = ScheduleRepository.getById(scheduleId);
+          if (schedule === undefined || schedule.componentType !== 'custom') {
+            continue;
+          }
+          bikeId = schedule.motorcycleId;
+          ScheduleRepository.softDelete(scheduleId);
+        }
+      });
+      if (bikeId !== undefined) {
+        emitDomainEvent('schedule:changed', { bikeId });
+      }
+      return ok(undefined);
+    });
+  },
+
+  /** Persists a new drag-and-drop order for a bike's custom components (item 13). */
+  reorderCustomComponents(motorcycleId: string, orderedScheduleIds: readonly string[]): Result<void> {
+    return guardService('schedule.reorderCustom', () => {
+      inTransaction(() => {
+        orderedScheduleIds.forEach((id, index) => {
+          ScheduleRepository.setSortOrder(id, index);
+        });
+      });
+      emitDomainEvent('schedule:changed', { bikeId: motorcycleId });
+      return ok(undefined);
+    });
+  },
+
+  /** Pins/unpins a component as a Dashboard "Quick Logs" card (item 11). */
+  setPinned(scheduleId: string, isPinned: boolean): Result<void> {
+    return guardService('schedule.setPinned', () => {
+      const schedule = ScheduleRepository.getById(scheduleId);
+      if (schedule === undefined) {
+        return err(appError('BusinessRuleError', 'schedule.notFound', 'Schedule not found'));
+      }
+      const nextOrder = isPinned ? ScheduleRepository.nextPinnedSortOrder(schedule.motorcycleId) : 0;
+      inTransaction(() => {
+        ScheduleRepository.setPinned(scheduleId, isPinned, nextOrder);
+      });
+      emitDomainEvent('schedule:changed', { bikeId: schedule.motorcycleId, scheduleId });
+      return ok(undefined);
+    });
+  },
+
+  /** Persists a new drag-and-drop order for a bike's pinned Quick Log cards. */
+  reorderPinned(motorcycleId: string, orderedScheduleIds: readonly string[]): Result<void> {
+    return guardService('schedule.reorderPinned', () => {
+      inTransaction(() => {
+        orderedScheduleIds.forEach((id, index) => {
+          ScheduleRepository.setPinnedSortOrder(id, index);
+        });
+      });
+      emitDomainEvent('schedule:changed', { bikeId: motorcycleId });
       return ok(undefined);
     });
   },

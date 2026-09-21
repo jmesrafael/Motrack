@@ -43,7 +43,7 @@ const useStyles = makeStyles((t) =>
 export function HealthHero({ score, bandId, bandLabel, onPress }: HealthHeroProps) {
   const styles = useStyles();
   const { tokens } = useTheme();
-  const a11yLabel = interpolate(strings.dashboard.health.a11y, { score: score ?? '—', band: bandLabel });
+  const a11yLabel = interpolate(strings.dashboard.health.a11y, { score: score ?? 'not set up', band: bandLabel });
 
   return (
     <Card onPress={onPress} accessibilityLabel={a11yLabel} size="lg">

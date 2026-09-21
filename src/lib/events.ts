@@ -7,6 +7,7 @@ export interface DomainEventPayload {
   bikeId?: string | undefined;
   scheduleId?: string | undefined;
   entityId?: string | undefined;
+  buildId?: string | undefined;
 }
 
 export type DomainEventName =
@@ -18,7 +19,8 @@ export type DomainEventName =
   | 'schedule:changed'
   | 'document:changed'
   | 'bike:changed'
-  | 'settings:changed';
+  | 'settings:changed'
+  | 'build:changed';
 
 type Listener = (payload: DomainEventPayload) => void;
 

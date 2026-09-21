@@ -79,6 +79,7 @@ export const baseIconSize: IconSizeTokens = {
 export const baseSize: ComponentSizeTokens = {
   buttonLg: 54,
   buttonMd: 44,
+  buttonSm: 44,
   input: 50,
   row: 56,
   fab: 58,

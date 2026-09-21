@@ -5,6 +5,7 @@
  */
 
 import { rawDb } from '@/db/client';
+import { formatCategoryName, formatComponentName, humanizeKey } from '@/lib/format';
 import type { ComponentType } from '@/types/enums';
 
 export type TimelineKind = 'maintenance' | 'repair' | 'fuel' | 'expense' | 'document' | 'bike';
@@ -112,4 +113,24 @@ export function loadTimeline(motorcycleId: string, filter: TimelineFilter): Time
     amountCentavos: r.amount_centavos,
     componentType: (r.component_type as ComponentType | null) ?? null,
   }));
+}
+
+/**
+ * Human-readable label for a `TimelineEntry.title`, which is sourced directly
+ * from a raw stored DB key (`component_type` / `category`) for maintenance
+ * and expense rows (see the SQL above) rather than a display string. History
+ * and Recent Activity must call this instead of reading `.title` directly, or
+ * the raw key (e.g. "engine_oil", "insurance") leaks straight to the screen.
+ */
+export function formatTimelineTitle(entry: Pick<TimelineEntry, 'kind' | 'title' | 'componentType'>): string {
+  if (entry.componentType !== null) {
+    return formatComponentName(entry.componentType, entry.title === 'custom' ? null : entry.title);
+  }
+  if (entry.kind === 'expense') {
+    return formatCategoryName(entry.title);
+  }
+  if (entry.kind === 'fuel' && entry.title === 'fuel') {
+    return humanizeKey('fuel');
+  }
+  return entry.title;
 }

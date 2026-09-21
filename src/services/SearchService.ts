@@ -10,6 +10,7 @@ import { DocumentRepository } from '@/db/repositories/DocumentRepository';
 import { ExpenseRepository } from '@/db/repositories/ExpenseRepository';
 import { FuelRepository } from '@/db/repositories/FuelRepository';
 import { RepairRepository } from '@/db/repositories/RepairRepository';
+import { formatCategoryName, formatComponentName } from '@/lib/format';
 
 export type SearchResultKind =
   | 'motorcycle'
@@ -85,7 +86,7 @@ export function searchAll(query: string): SearchResult[] {
       kind: 'maintenance',
       id: r.id,
       motorcycleId: r.motorcycle_id,
-      title: r.custom_name ?? r.component_type,
+      title: formatComponentName(r.component_type, r.custom_name),
       subtitle: r.notes ?? r.brand,
       date: r.performed_date,
     });
@@ -107,7 +108,7 @@ export function searchAll(query: string): SearchResult[] {
       kind: 'fuel',
       id: f.id,
       motorcycleId: f.motorcycleId,
-      title: f.station ?? 'fuel',
+      title: f.station ?? 'Fuel',
       subtitle: f.notes,
       date: f.fuelDate,
     });
@@ -118,7 +119,7 @@ export function searchAll(query: string): SearchResult[] {
       kind: 'expense',
       id: e.id,
       motorcycleId: e.motorcycleId,
-      title: e.category,
+      title: formatCategoryName(e.category),
       subtitle: e.notes,
       date: e.expenseDate,
     });

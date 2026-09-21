@@ -62,6 +62,9 @@ const scheduleRowSchema = z.object({
   anchor_odometer_km: z.number().int().nullable(),
   anchor_date: z.string().nullable(),
   anchor_source: z.string().nullable(),
+  is_pinned: z.number().int(),
+  pinned_sort_order: z.number().int(),
+  sort_order: z.number().int(),
 });
 
 const recordRowSchema = z.object({
@@ -102,7 +105,9 @@ const expenseRowSchema = z.object({
   amount_centavos: z.number().int(),
   expense_date: z.string(),
   notes: z.string().nullable(),
-  photo_path: z.string().nullable(),
+  images: z.string().nullable(),
+  build_id: z.string().nullable(),
+  schedule_id: z.string().nullable(),
 });
 
 const fuelRowSchema = z.object({
@@ -137,6 +142,33 @@ const documentRowSchema = z.object({
   file_size: z.number().int(),
   expiry_date: z.string().nullable(),
   notes: z.string().nullable(),
+  document_number: z.string().nullable(),
+  link: z.string().nullable(),
+  extra_files: z.string().nullable(),
+});
+
+const buildRowSchema = z.object({
+  ...syncColumns,
+  motorcycle_id: z.string(),
+  name: z.string(),
+  description: z.string().nullable(),
+  cover_photo: z.string().nullable(),
+  budget_centavos: z.number().int().nullable(),
+  sort_order: z.number().int(),
+});
+
+const buildPlanItemRowSchema = z.object({
+  ...syncColumns,
+  build_id: z.string(),
+  name: z.string(),
+  estimated_price_centavos: z.number().int().nullable(),
+  photos: z.string().nullable(),
+  product_link: z.string().nullable(),
+  notes: z.string().nullable(),
+  priority: z.string(),
+  is_acquired: z.number().int(),
+  acquired_expense_id: z.string().nullable(),
+  sort_order: z.number().int(),
 });
 
 const appSettingRowSchema = z.object({
@@ -145,16 +177,18 @@ const appSettingRowSchema = z.object({
   updated_at: z.number().int(),
 });
 
-/** Owning table → row schema. Order matters for restore insert (FK-safe). */
+/** Owning table → row schema. Order matters for restore insert (FK-safe): builds before expenses (build_id), build_plan_items last (references both builds and expenses). */
 export const BACKUP_TABLE_SCHEMAS = {
   motorcycles: motorcycleRowSchema,
   maintenance_schedules: scheduleRowSchema,
   maintenance_records: recordRowSchema,
   repairs: repairRowSchema,
+  builds: buildRowSchema,
   expenses: expenseRowSchema,
   fuel_logs: fuelRowSchema,
   odometer_logs: odometerRowSchema,
   documents: documentRowSchema,
+  build_plan_items: buildPlanItemRowSchema,
 } as const;
 
 export type BackupTableName = keyof typeof BACKUP_TABLE_SCHEMAS;
@@ -164,10 +198,12 @@ export const BACKUP_TABLE_ORDER: readonly BackupTableName[] = [
   'maintenance_schedules',
   'maintenance_records',
   'repairs',
+  'builds',
   'expenses',
   'fuel_logs',
   'odometer_logs',
   'documents',
+  'build_plan_items',
 ];
 
 export const backupDataSchema = z.object({
@@ -175,10 +211,12 @@ export const backupDataSchema = z.object({
   maintenance_schedules: z.array(scheduleRowSchema),
   maintenance_records: z.array(recordRowSchema),
   repairs: z.array(repairRowSchema),
+  builds: z.array(buildRowSchema),
   expenses: z.array(expenseRowSchema),
   fuel_logs: z.array(fuelRowSchema),
   odometer_logs: z.array(odometerRowSchema),
   documents: z.array(documentRowSchema),
+  build_plan_items: z.array(buildPlanItemRowSchema),
   app_settings: z.array(appSettingRowSchema),
 });
 export type BackupData = z.infer<typeof backupDataSchema>;

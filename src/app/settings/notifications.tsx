@@ -40,7 +40,7 @@ const useStyles = makeStyles((t) =>
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      minHeight: 44,
+      minHeight: t.size.buttonMd,
       paddingHorizontal: t.space.s4,
     },
     timeLabel: typeStyle(t.type.body, t.text.primary),

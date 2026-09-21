@@ -14,7 +14,8 @@ import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-na
 import { Icon } from '@/components/Icon';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { SecondaryButton } from '@/components/SecondaryButton';
-import { interpolate, strings } from '@/i18n/strings';
+import { interpolate } from '@/i18n/strings';
+import { useStrings } from '@/i18n/useStrings';
 import { makeStyles, typeStyle } from '@/theme/styles';
 import { useTheme } from '@/theme/useTheme';
 import { placeTooltip, type Placement } from '../placeTooltip';
@@ -86,7 +87,7 @@ const useStyles = makeStyles((t) =>
       flex: 1,
     },
     skipButton: {
-      minHeight: 44,
+      minHeight: t.size.buttonMd,
       justifyContent: 'center',
       paddingHorizontal: t.space.s2,
     },
@@ -104,7 +105,7 @@ const useStyles = makeStyles((t) =>
   }),
 );
 
-function tryItHint(step: TutorialStep): string | null {
+function tryItHint(step: TutorialStep, strings: ReturnType<typeof useStrings>): string | null {
   switch (step.advance.type) {
     case 'tap-anchor':
       return strings.tutorial.common.tryIt;
@@ -136,6 +137,7 @@ export function TutorialTooltip({
 }: TutorialTooltipProps) {
   const styles = useStyles();
   const { tokens } = useTheme();
+  const strings = useStrings();
   const cardRef = useRef<View | null>(null);
   const [size, setSize] = useState<{ width: number; height: number } | null>(null);
   const opacity = useSharedValue(0);
@@ -190,7 +192,7 @@ export function TutorialTooltip({
     preferred: step.placement ?? 'auto',
   });
 
-  const hint = tryItHint(step);
+  const hint = tryItHint(step, strings);
   const isPassive = step.advance.type === 'next';
   const isLast = stepIndex === totalSteps - 1;
 
@@ -254,11 +256,12 @@ export function TutorialTooltip({
           <Text style={styles.skipLabel}>{strings.tutorial.common.skip}</Text>
         </Pressable>
         {stepIndex > 0 ? (
-          <SecondaryButton label={strings.tutorial.common.back} onPress={onPrev} />
+          <SecondaryButton label={strings.tutorial.common.back} size="md" onPress={onPrev} />
         ) : null}
         {isPassive ? (
           <PrimaryButton
             label={isLast ? strings.tutorial.common.done : strings.tutorial.common.next}
+            size="md"
             onPress={onNext}
           />
         ) : null}

@@ -242,6 +242,8 @@ export interface IconSizeTokens {
 export interface ComponentSizeTokens {
   buttonLg: number;
   buttonMd: number;
+  /** Floor is the platform minimum touch target (44px), not a smaller "compact" button. */
+  buttonSm: number;
   input: number;
   row: number;
   fab: number;

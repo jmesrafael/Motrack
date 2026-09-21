@@ -24,6 +24,7 @@ const useStyles = makeStyles((t) =>
     grid: { flexDirection: 'row', flexWrap: 'wrap', gap: t.space.s3 },
     tile: { width: '47%' },
     tileCard: { alignItems: 'center', gap: 2 },
+    tilePress: { alignItems: 'center', width: '100%' },
     iconWell: {
       width: 64,
       height: 64,
@@ -65,7 +66,8 @@ export default function GarageRoute() {
       <View key={bike.id} style={styles.tile}>
         <Card style={styles.tileCard}>
           <PressableScale
-            containerStyle={{ alignItems: 'center' }}
+            containerStyle={{ width: '100%' }}
+            style={styles.tilePress}
             onPress={() => router.push(`/bike/${bike.id}/edit`)}
             accessibilityRole="button"
             accessibilityLabel={`Edit ${bike.nickname}`}>

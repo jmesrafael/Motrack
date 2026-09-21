@@ -74,14 +74,14 @@ export default function StatisticsRoute() {
         <View style={styles.card}>
           <StatCard
             label="Avg monthly spend"
-            value={stats.averageMonthlySpendCentavos !== null ? formatMoney(stats.averageMonthlySpendCentavos) : '—'}
+            value={stats.averageMonthlySpendCentavos !== null ? formatMoney(stats.averageMonthlySpendCentavos) : '-'}
             icon="trendingUp"
           />
         </View>
         <View style={styles.card}>
           <StatCard
             label="Cost/km"
-            value={stats.costPerKmCentavos !== null ? formatMoney(stats.costPerKmCentavos) : '—'}
+            value={stats.costPerKmCentavos !== null ? formatMoney(stats.costPerKmCentavos) : '-'}
             icon="trendingUp"
           />
         </View>
@@ -89,7 +89,7 @@ export default function StatisticsRoute() {
           <View style={styles.card}>
             <StatCard
               label="Avg consumption"
-              value={stats.averageKmPerLiter !== null ? `${stats.averageKmPerLiter.toFixed(1)} km/L` : '—'}
+              value={stats.averageKmPerLiter !== null ? `${stats.averageKmPerLiter.toFixed(1)} km/L` : '-'}
               icon="fuel"
             />
           </View>

@@ -14,7 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/Button';
 import type { IconName } from '@/components/Icon';
-import { strings } from '@/i18n/strings';
+import { useStrings } from '@/i18n/useStrings';
 import { makeStyles, typeStyle } from '@/theme/styles';
 import { useTheme } from '@/theme/useTheme';
 import { OnboardingIllustration, type FloatingBadge } from './OnboardingIllustration';
@@ -100,6 +100,7 @@ const useStyles = makeStyles((t) =>
 export function OnboardingCarousel({ onSkip, onFinish }: OnboardingCarouselProps) {
   const styles = useStyles();
   const { tokens } = useTheme();
+  const strings = useStrings();
   const insets = useSafeAreaInsets();
   const scrollRef = useRef<ScrollView | null>(null);
   const [index, setIndex] = useState(0);

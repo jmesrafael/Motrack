@@ -5,11 +5,20 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useTabBarStore } from '@/stores/useTabBarStore';
 import { makeStyles } from '@/theme/styles';
+import { useTheme } from '@/theme/useTheme';
 import { registerScroll, unregisterScroll } from '@/tutorial/anchors';
 import { TutorialScrollContext } from '@/tutorial/ui/scrollContext';
 
 /** How close to the end (px) counts as "reached the bottom" for the tab bar. */
 const TAB_BAR_BOTTOM_THRESHOLD = 24;
+
+/**
+ * Space reserved above the device's bottom safe-area inset for the floating
+ * TabBar: its own gap off-screen-bottom (10) + its height (t.size.navHeight,
+ * 64) + breathing room (16) so the last row of content never rides flush
+ * against the pill. Mirrors TabBar.tsx's own `bottom: insets.bottom + 10`.
+ */
+const TAB_BAR_CLEARANCE = 90;
 
 export interface ScreenProps {
   children: ReactNode;
@@ -34,7 +43,6 @@ const useStyles = makeStyles((t) =>
     },
     content: {
       paddingHorizontal: t.space.gutter,
-      paddingBottom: t.space.s6,
     },
     stack: {
       gap: t.space.s4,
@@ -42,7 +50,6 @@ const useStyles = makeStyles((t) =>
     fixed: {
       flex: 1,
       paddingHorizontal: t.space.gutter,
-      paddingBottom: t.space.s4,
       gap: t.space.s4,
     },
   }),
@@ -76,10 +83,18 @@ export function Screen({
   noAnimation = false,
 }: ScreenProps) {
   const styles = useStyles();
+  const { tokens } = useTheme();
   const insets = useSafeAreaInsets();
   const scrollRef = useRef<ScrollView | null>(null);
   const enter = useEnterAnimation(noAnimation);
-  const tabBarInset = withTabBarInset ? 100 : 0;
+  // Additive, not a flat replacement: every screen keeps its base bottom
+  // spacing AND the device's real bottom safe-area inset. The previous flat
+  // `withTabBarInset ? 100 : 0` ignored insets.bottom entirely, so on any
+  // screen without a tab bar the last content row had zero bottom protection,
+  // and even tab-root screens under-reserved space on devices with a tall
+  // home-indicator inset.
+  const bottomPad =
+    insets.bottom + (withTabBarInset ? TAB_BAR_CLEARANCE : scroll ? tokens.space.s6 : tokens.space.s4);
   const setTabBarHidden = useTabBarStore((s) => s.setHidden);
 
   useEffect(() => {
@@ -112,7 +127,7 @@ export function Screen({
   if (!scroll) {
     return (
       <View style={styles.root}>
-        <Animated.View style={[styles.fixed, { paddingTop: insets.top, paddingBottom: tabBarInset }, enter]}>
+        <Animated.View style={[styles.fixed, { paddingTop: insets.top, paddingBottom: bottomPad }, enter]}>
           {children}
         </Animated.View>
       </View>
@@ -124,7 +139,7 @@ export function Screen({
       ref={scrollRef}
       contentContainerStyle={[
         styles.content,
-        { paddingTop: insets.top + 8, paddingBottom: tabBarInset },
+        { paddingTop: insets.top + 8, paddingBottom: bottomPad },
       ]}
       onScroll={handleScroll}
       scrollEventThrottle={16}

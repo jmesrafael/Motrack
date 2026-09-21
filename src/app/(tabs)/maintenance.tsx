@@ -1,15 +1,19 @@
 import { useRouter } from 'expo-router';
+import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { EmptyState } from '@/components/EmptyState';
+import { IconButton } from '@/components/IconButton';
 import { ScheduleRow } from '@/components/ScheduleRow';
 import { Screen } from '@/components/Screen';
 import { SecondaryButton } from '@/components/SecondaryButton';
+import { TextField } from '@/components/TextField';
 import { componentIcon, componentLabel } from '@/features/maintenance/componentMeta';
 import { useSchedules } from '@/features/maintenance/hooks/useSchedules';
 import { formatRemaining } from '@/features/maintenance/remainingText';
 import { useActiveBike } from '@/hooks/useActiveBike';
 import { strings } from '@/i18n/strings';
+import { normalizeForCompare } from '@/lib/format';
 import { makeStyles, typeStyle } from '@/theme/styles';
 import { TutorialAnchor } from '@/tutorial/ui/TutorialAnchor';
 import type { ComponentType } from '@/types/enums';
@@ -20,6 +24,8 @@ const useStyles = makeStyles((t) =>
     summary: typeStyle(t.type.caption, t.text.secondary),
     sectionTitle: { ...typeStyle(t.type.h2, t.text.primary), marginTop: t.space.s4 },
     listAnchor: { gap: t.space.s4 },
+    searchRow: { flexDirection: 'row', alignItems: 'center', gap: t.space.s2, marginTop: t.space.s3 },
+    searchInput: { flex: 1 },
   }),
 );
 
@@ -29,6 +35,7 @@ export default function MaintenanceRoute() {
   const router = useRouter();
   const { activeBike } = useActiveBike();
   const { items } = useSchedules(activeBike?.id ?? null, activeBike?.currentOdometerKm ?? 0);
+  const [query, setQuery] = useState('');
 
   if (activeBike === null) {
     return (
@@ -38,11 +45,18 @@ export default function MaintenanceRoute() {
     );
   }
 
-  const enabled = items.filter((i) => i.schedule.isEnabled === 1);
-  const disabled = items.filter((i) => i.schedule.isEnabled === 0);
+  const normalizedQuery = normalizeForCompare(query);
+  const matches = (i: (typeof items)[number]) =>
+    normalizedQuery === '' ||
+    normalizeForCompare(componentLabel(i.schedule.componentType as ComponentType, i.schedule.customName)).includes(
+      normalizedQuery,
+    );
+
+  const enabled = items.filter((i) => i.schedule.isEnabled === 1 && matches(i));
+  const disabled = items.filter((i) => i.schedule.isEnabled === 0 && matches(i));
   const sorted = [...enabled].sort((a, b) => (b.status.ratio ?? -1) - (a.status.ratio ?? -1));
-  const overdueCount = enabled.filter((i) => i.status.status === 'overdue').length;
-  const dueSoonCount = enabled.filter((i) => i.status.status === 'dueSoon').length;
+  const overdueCount = items.filter((i) => i.schedule.isEnabled === 1 && i.status.status === 'overdue').length;
+  const dueSoonCount = items.filter((i) => i.schedule.isEnabled === 1 && i.status.status === 'dueSoon').length;
 
   return (
     <Screen tutorialScrollId="maintenance" withTabBarInset>
@@ -50,6 +64,30 @@ export default function MaintenanceRoute() {
       <Text style={styles.summary}>
         {overdueCount} overdue · {dueSoonCount} due soon
       </Text>
+      <View style={styles.searchRow}>
+        <TextField
+          style={styles.searchInput}
+          value={query}
+          onChangeText={setQuery}
+          placeholder="Search components"
+          returnKeyType="search"
+        />
+        <IconButton
+          icon="plus"
+          variant="accent"
+          accessibilityLabel="Custom components"
+          onPress={() => router.push('/maintenance/custom')}
+        />
+      </View>
+      {normalizedQuery !== '' && enabled.length === 0 && disabled.length === 0 ? (
+        <EmptyState
+          icon="search"
+          title="No matching components"
+          body={`Nothing matches "${query}". Try a different search, or add it as a custom component.`}
+          ctaLabel="Add custom component"
+          onCtaPress={() => router.push('/maintenance/custom')}
+        />
+      ) : null}
       <TutorialAnchor id="maintenance.list" style={styles.listAnchor}>
         {sorted.slice(0, 4).map((item) => {
           const componentType = item.schedule.componentType as ComponentType;
@@ -99,7 +137,6 @@ export default function MaintenanceRoute() {
           })}
         </>
       ) : null}
-      <SecondaryButton label="+ Custom component" onPress={() => router.push('/maintenance/custom')} />
       <SecondaryButton label="History" onPress={() => router.push('/maintenance/history')} />
       <View />
     </Screen>

@@ -11,6 +11,19 @@ import { runTx } from './MaintenanceService';
 import { expenseInput, type ExpenseInput } from './validation/schemas';
 import { guardService, validateWith } from './serviceUtils';
 
+/** `expenses.images` is stored as a JSON array string; every read site should go through this. */
+export function parseExpenseImages(row: Pick<ExpenseRow, 'images'>): string[] {
+  if (row.images === null) {
+    return [];
+  }
+  try {
+    const parsed: unknown = JSON.parse(row.images);
+    return Array.isArray(parsed) ? parsed.filter((p): p is string => typeof p === 'string') : [];
+  } catch {
+    return [];
+  }
+}
+
 export const ExpenseService = {
   saveExpense(motorcycleId: string, input: unknown): Result<ExpenseRow> {
     const parsed = validateWith(expenseInput, input);
@@ -26,7 +39,9 @@ export const ExpenseService = {
           amountCentavos: value.amountCentavos,
           expenseDate: value.expenseDate,
           notes: value.notes,
-          photoPath: value.photoPath,
+          images: value.images,
+          buildId: value.buildId,
+          scheduleId: value.scheduleId,
         }),
       );
       if (result.ok) {
@@ -53,7 +68,9 @@ export const ExpenseService = {
           amountCentavos: value.amountCentavos,
           expenseDate: value.expenseDate,
           notes: value.notes,
-          photoPath: value.photoPath,
+          images: value.images,
+          buildId: value.buildId,
+          scheduleId: value.scheduleId,
         });
       });
       if (result.ok) {

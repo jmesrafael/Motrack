@@ -21,6 +21,7 @@ import { HealthHero } from './HealthHero';
 import { MonthlyStatsCard } from './MonthlyStatsCard';
 import { OdometerCard } from './OdometerCard';
 import { QuickActionsGrid } from './QuickActionsGrid';
+import { QuickLogsSection } from './QuickLogsSection';
 import { ThemeCycleButton } from './ThemeCycleButton';
 
 function activityCaption(entry: ActivityVm): string {
@@ -90,6 +91,7 @@ export function DashboardScreen() {
           onPress={() => router.push('/documents')}
         />
       ) : null}
+      <QuickLogsSection bikeId={bike.id} currentOdometerKm={bike.odometerKm} />
       <ListSection title={strings.dashboard.nextMaintenance.title}>
         {vm.data.upcoming.length === 0 ? null : (
           vm.data.upcoming.map((schedule) => (

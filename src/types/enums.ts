@@ -72,3 +72,6 @@ export type RecordSource = (typeof RECORD_SOURCES)[number];
 
 export const ANCHOR_SOURCES = ['record', 'baseline'] as const;
 export type AnchorSource = (typeof ANCHOR_SOURCES)[number];
+
+export const BUILD_PLAN_PRIORITIES = ['low', 'normal', 'high'] as const;
+export type BuildPlanPriority = (typeof BUILD_PLAN_PRIORITIES)[number];

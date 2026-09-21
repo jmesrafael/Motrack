@@ -55,7 +55,9 @@ const GLYPHS = {
   statusNeutral: 'help-circle-outline',
   themeSystem: 'theme-light-dark',
   themeLight: 'white-balance-sunny',
-  themeDark: 'moon-full',
+  // A clearly-recognizable crescent, not a filled circle that reads as a
+  // plain dot at small (iconSize.md) sizes.
+  themeDark: 'moon-waning-crescent',
   hourglass: 'timer-sand',
   close: 'close',
   help: 'help-circle-outline',
@@ -79,6 +81,10 @@ const GLYPHS = {
   file: 'file-outline',
   image: 'image-outline',
   dot: 'circle-medium',
+  dragHandle: 'drag-vertical-variant',
+  minus: 'minus-circle-outline',
+  link: 'link-variant',
+  zoomIn: 'magnify-plus-outline',
 } as const satisfies Record<string, GlyphName>;
 
 export type IconName = keyof typeof GLYPHS | keyof typeof MATERIAL_GLYPHS;

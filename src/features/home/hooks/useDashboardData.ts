@@ -8,8 +8,8 @@ import { formatRemaining } from '@/features/maintenance/remainingText';
 import { useActiveBike } from '@/hooks/useActiveBike';
 import { strings } from '@/i18n/strings';
 import { addDays, todayIso } from '@/lib/dates';
-import { formatFullDate, formatMoney } from '@/lib/format';
-import { loadTimeline } from '@/services/TimelineService';
+import { formatCategoryName, formatFullDate, formatMoney } from '@/lib/format';
+import { formatTimelineTitle, loadTimeline } from '@/services/TimelineService';
 import type { ChartTokens } from '@/theme/types';
 import type {
   ActivityKind,
@@ -109,7 +109,7 @@ export function useDashboardData(): DashboardVm {
             : entry.kind === 'repair'
               ? 'repair'
               : 'maintenance',
-      title: entry.title,
+      title: formatTimelineTitle(entry),
       dateIso: entry.date,
       ...(entry.odometerKm !== null ? { odometerKm: entry.odometerKm } : {}),
       amountCentavos: entry.amountCentavos ?? 0,
@@ -123,7 +123,7 @@ export function useDashboardData(): DashboardVm {
     const monthTotal = categoryTotals.reduce((sum, c) => sum + c.totalCentavos, 0);
     const categories: MonthCategoryVm[] = categoryTotals.slice(0, 5).map((c, index) => ({
       id: c.category,
-      label: strings.categories[c.category],
+      label: formatCategoryName(c.category),
       amountCentavos: c.totalCentavos,
       slot: (CHART_SLOTS[index] ?? 'other') as MonthCategoryVm['slot'],
     }));

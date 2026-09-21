@@ -165,7 +165,7 @@ export function HealthRing({
         ) : null}
       </Svg>
       <View style={[styles.center, { pointerEvents: 'none' }]}>
-        <Text style={styles.score}>{score === null ? '—' : String(score)}</Text>
+        <Text style={styles.score}>{score === null ? '-' : String(score)}</Text>
         <Text style={styles.suffix}>{scoreSuffix}</Text>
         <View style={[styles.bandChip, { backgroundColor: colorBg }]}>
           <View style={[styles.bandDot, { backgroundColor: color }]} />

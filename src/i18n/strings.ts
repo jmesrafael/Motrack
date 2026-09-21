@@ -117,6 +117,15 @@ export const strings = {
     invoice: 'Invoice',
     other: 'Other',
   },
+  sources: {
+    odometer: {
+      initial: 'Starting reading',
+      manual: 'Manual entry',
+      fuel: 'Fuel log',
+      maintenance: 'Maintenance log',
+      repair: 'Repair log',
+    },
+  },
   onboarding: {
     welcome: {
       title: 'Welcome to Motrack',
@@ -135,20 +144,29 @@ export const strings = {
       stages: [
         {
           eyebrow: '01',
-          title: 'Know Your Bike',
-          body: 'Keep your motorcycle information organized in one place — model, plate, VIN, and the odometer that drives everything else.',
+          title: 'Know your bike',
+          body: 'Keep your bike’s details in one place: model, plate, VIN, and the odometer that everything else runs on.',
         },
         {
           eyebrow: '02',
-          title: 'Never Miss Maintenance',
-          body: 'Track services, maintenance schedules, mileage, and upcoming tasks with a live Health Score for your bike.',
+          title: 'Never miss maintenance',
+          body: 'Track services, schedules, and mileage, plus a live Health Score so you always know how your bike is doing.',
         },
         {
           eyebrow: '03',
-          title: 'Keep Your History',
-          body: 'Build a useful maintenance history over time — every service, every peso spent, one searchable timeline.',
+          title: 'Keep your history',
+          body: 'Build a real maintenance history over time. Every service, every peso spent, all in one searchable timeline.',
         },
       ] as { eyebrow: string; title: string; body: string }[],
+    },
+    language: {
+      title: 'Choose your language',
+      body: 'Pick the language you want Motrack to use. You can change this anytime in Settings.',
+      english: 'English',
+      englishHint: 'Use English throughout the app',
+      tagalog: 'Tagalog',
+      tagalogHint: 'Use Tagalog throughout the app',
+      continue: 'Continue',
     },
     setup: {
       title: 'Set up your bike',
@@ -162,27 +180,22 @@ export const strings = {
       exitBody: 'You can add your motorcycle and history later from the Garage.',
       exitConfirm: 'Exit setup',
       bike: {
-        title: 'Your motorcycle',
-        body: 'Add your bike and its current odometer. You can edit everything later.',
+        title: 'Add your motorcycle',
+        body: 'Tell us the basics: model, plate, and current odometer.',
+        why: 'This is what your dashboard and reminders are built around.',
       },
       oil: {
         title: 'Last oil change',
-        body: 'Roughly when was the engine oil last changed? This seeds your maintenance schedule. Skip it if you are not sure.',
+        body: 'When did you last change the engine oil? Skip this if you are not sure.',
+        why: 'We will use this to start your maintenance schedule.',
         dateLabel: 'Date of last oil change',
         odoLabel: 'Odometer at that time (km, optional)',
         save: 'Save oil change',
         saved: 'Oil change recorded.',
       },
-      initial: {
-        title: 'Recent maintenance',
-        body: 'Tick anything else serviced recently so your schedule starts accurate. Optional.',
-        dateLabel: 'Approximate date',
-        save: 'Save selected',
-        saved: '{count} records added.',
-      },
       done: {
-        title: 'All set!',
-        body: 'Your garage is ready. Next stop: the dashboard.',
+        title: 'You are all set',
+        body: 'Your garage is ready. Next stop, the dashboard.',
         cta: 'Go to dashboard',
       },
     },
@@ -354,6 +367,7 @@ export const strings = {
   help: {
     title: 'Help & Tutorials',
     toursSection: 'Guided tours',
+    articlesSection: 'Guides',
     optionsSection: 'Options',
     status: {
       completed: 'Completed',
@@ -369,6 +383,18 @@ export const strings = {
     resetTitle: 'Reset tutorial progress?',
     resetBody: 'Tours, tips, and onboarding will be marked unseen. Motorcycles, maintenance, fuel, expenses, and documents are not touched.',
     resetConfirm: 'Reset progress',
+    maintenanceDates: {
+      rowTitle: 'How to track maintenance dates',
+      title: 'How to track maintenance dates',
+      whenTitle: 'When to log a service',
+      whenBody: 'Log a maintenance item as soon as you finish it, like an oil change or a new set of brake pads. Motrack uses that date and odometer reading to plan the next one.',
+      datesTitle: 'How dates work',
+      datesBody: 'Each component remembers the last date it was serviced. You can update this anytime from the component screen in Maintenance, no need to set it during setup.',
+      intervalsTitle: 'How odometer intervals work',
+      intervalsBody: 'Every component has a recommended interval, in kilometers, months, or both. Motrack counts from your last log to tell you roughly when the next one is due.',
+      remindersTitle: 'How reminders use this',
+      remindersBody: 'When a component is due soon or overdue, Motrack shows it on your dashboard and can send a reminder. Keeping your odometer updated keeps these estimates accurate.',
+    },
   },
   /** Canonical copy templates — NOTIFICATION_ENGINE.md §8. Use with `interpolate`. */
   notification: {

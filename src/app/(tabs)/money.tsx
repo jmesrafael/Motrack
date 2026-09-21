@@ -1,16 +1,16 @@
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { EmptyState } from '@/components/EmptyState';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { Screen } from '@/components/Screen';
+import { SecondaryButton } from '@/components/SecondaryButton';
 import { SegmentedControl } from '@/components/SegmentedControl';
 import { StatCard } from '@/components/StatCard';
 import { TimelineItem } from '@/components/TimelineItem';
 import { useActiveBike } from '@/hooks/useActiveBike';
-import { strings } from '@/i18n/strings';
-import { formatMoney, formatMonthDay } from '@/lib/format';
+import { formatCategoryName, formatMoney, formatMonthDay } from '@/lib/format';
 import { useMoneyStore } from '@/stores/useMoneyStore';
 import { makeStyles, typeStyle } from '@/theme/styles';
 
@@ -18,6 +18,7 @@ const useStyles = makeStyles((t) =>
   StyleSheet.create({
     title: typeStyle(t.type.h1, t.text.primary),
     total: { ...typeStyle(t.type.display, t.text.primary), fontVariant: ['tabular-nums'] },
+    headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   }),
 );
 
@@ -51,7 +52,10 @@ export default function MoneyRoute() {
 
   return (
     <Screen withTabBarInset>
-      <Text style={styles.title}>Expense</Text>
+      <View style={styles.headerRow}>
+        <Text style={styles.title}>Expense</Text>
+        <SecondaryButton label="Builds" icon="garage" size="sm" onPress={() => router.push('/builds' as never)} />
+      </View>
       <SegmentedControl segments={SEGMENTS} value={segment} onChange={setSegment} />
       {segment === 'expenses' ? (
         <>
@@ -61,7 +65,7 @@ export default function MoneyRoute() {
             <TimelineItem
               key={`${row.source}-${row.id}`}
               icon={row.source === 'fuel' ? 'fuel' : row.source === 'repair' ? 'repair' : 'expense'}
-              title={strings.categories[row.category]}
+              title={formatCategoryName(row.category)}
               caption={`${formatMonthDay(row.date)}${row.label !== null ? ` · ${row.label}` : ''}`}
               amount={formatMoney(row.amountCentavos)}
               isRepair={row.source === 'repair'}
@@ -84,11 +88,11 @@ export default function MoneyRoute() {
           <PrimaryButton label="+ Fuel" onPress={() => router.push('/fuel/log')} />
           <StatCard
             label="Avg consumption"
-            value={money.averageKmPerLiter !== null ? `${money.averageKmPerLiter.toFixed(1)} km/L` : '—'}
+            value={money.averageKmPerLiter !== null ? `${money.averageKmPerLiter.toFixed(1)} km/L` : '-'}
           />
           <StatCard
             label="Cost/km"
-            value={money.fuelCostPerKmCentavos !== null ? formatMoney(money.fuelCostPerKmCentavos) : '—'}
+            value={money.fuelCostPerKmCentavos !== null ? formatMoney(money.fuelCostPerKmCentavos) : '-'}
           />
           {money.fuelLogs.map((log) => (
             <TimelineItem

@@ -9,7 +9,7 @@ import { TimelineItem } from '@/components/TimelineItem';
 import { componentIcon } from '@/features/maintenance/componentMeta';
 import { useActiveBike } from '@/hooks/useActiveBike';
 import { formatMoney, formatMonthDay } from '@/lib/format';
-import { loadTimeline } from '@/services/TimelineService';
+import { formatTimelineTitle, loadTimeline } from '@/services/TimelineService';
 
 /** S-14 Maintenance history — reverse-chronological maintenance + repairs. */
 export default function MaintenanceHistoryRoute() {
@@ -56,13 +56,13 @@ export default function MaintenanceHistoryRoute() {
         <TimelineItem
           key={entry.id}
           icon={entry.componentType !== null ? componentIcon(entry.componentType) : 'repair'}
-          title={entry.title}
+          title={formatTimelineTitle(entry)}
           caption={
             entry.odometerKm !== null
               ? `${formatMonthDay(entry.date)} · ${entry.odometerKm.toLocaleString('en-PH')} km`
               : formatMonthDay(entry.date)
           }
-          amount={entry.amountCentavos !== null ? formatMoney(entry.amountCentavos) : '—'}
+          amount={entry.amountCentavos !== null ? formatMoney(entry.amountCentavos) : '-'}
           isRepair={entry.kind === 'repair'}
           onPress={() =>
             router.push(

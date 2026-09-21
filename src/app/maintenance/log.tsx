@@ -9,10 +9,10 @@ import { DestructiveButton } from '@/components/DestructiveButton';
 import { FormField } from '@/components/FormField';
 import { MoneyInput } from '@/components/MoneyInput';
 import { OdoInput } from '@/components/OdoInput';
-import { PickerField } from '@/components/PickerField';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { Screen } from '@/components/Screen';
 import { ScreenHeader } from '@/components/ScreenHeader';
+import { SearchOrAdd } from '@/components/SearchOrAdd';
 import { SegmentedControl } from '@/components/SegmentedControl';
 import { TextField } from '@/components/TextField';
 import { showToast } from '@/components/Toast';
@@ -22,6 +22,7 @@ import { componentLabel } from '@/features/maintenance/componentMeta';
 import { useActiveBike } from '@/hooks/useActiveBike';
 import { todayIso } from '@/lib/dates';
 import { MaintenanceService } from '@/services/MaintenanceService';
+import { ScheduleService } from '@/services/ScheduleService';
 import { componentDefaultServiceType } from '@/db/seed/defaults';
 import { makeStyles, typeStyle } from '@/theme/styles';
 import { SERVICE_TYPES, type ComponentType, type ServiceType } from '@/types/enums';
@@ -48,6 +49,8 @@ export default function MaintenanceLogRoute() {
   const initialScheduleId = existingRecord?.scheduleId ?? params.scheduleId ?? null;
 
   const bikeId = existingRecord?.motorcycleId ?? activeBike?.id ?? null;
+  const [refreshKey, setRefreshKey] = useState(0);
+  void refreshKey;
   const schedules = bikeId !== null ? ScheduleRepository.listByBike(bikeId).filter((s) => s.isEnabled === 1) : [];
 
   const [scheduleId, setScheduleId] = useState<string | null>(initialScheduleId);
@@ -138,14 +141,33 @@ export default function MaintenanceLogRoute() {
       <ScreenHeader title={existingRecord !== undefined ? 'Edit record' : 'Log maintenance'} />
       {formError !== undefined ? <Text style={styles.error}>{formError}</Text> : null}
       <FormField label="Component" required error={fieldErrors?.scheduleId}>
-        <PickerField
+        <SearchOrAdd
           options={schedules.map((s) => ({
             value: s.id,
             label: componentLabel(s.componentType as ComponentType, s.customName),
           }))}
           value={scheduleId}
-          onChange={setScheduleId}
-          placeholder="Select component"
+          onSelect={setScheduleId}
+          onAdd={(label) => {
+            if (bikeId === null) {
+              return;
+            }
+            const result = ScheduleService.addCustomComponent(bikeId, {
+              customName: label,
+              intervalKm: null,
+              // A neutral starting interval; editable anytime from the component screen.
+              intervalMonths: 6,
+            });
+            if (result.ok) {
+              setScheduleId(result.value.id);
+              setRefreshKey((k) => k + 1);
+              showToast(`Added "${label}" as a custom component`);
+            } else {
+              setFormError(result.error.message);
+            }
+          }}
+          placeholder="Search or add a component"
+          addLabel="Add as custom component"
         />
       </FormField>
       <FormField label="Date" required error={fieldErrors?.performedDate}>

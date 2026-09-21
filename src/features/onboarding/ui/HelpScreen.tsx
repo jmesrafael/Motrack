@@ -10,7 +10,8 @@ import { Screen } from '@/components/Screen';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { showToast } from '@/components/Toast';
 import { Toggle } from '@/components/Toggle';
-import { interpolate, strings } from '@/i18n/strings';
+import { interpolate } from '@/i18n/strings';
+import { useStrings } from '@/i18n/useStrings';
 import { useTutorialStore } from '@/stores/useTutorialStore';
 import { startTutorial } from '@/tutorial/engine';
 import { listTours } from '@/tutorial/registry';
@@ -24,13 +25,6 @@ import { useTheme } from '@/theme/useTheme';
  * toggle Tutorial Mode (re-enables tips; user data untouched), and reset
  * tutorial progress only.
  */
-
-const STATUS_LABEL: Record<TutorialStatus, string> = {
-  completed: strings.help.status.completed,
-  in_progress: strings.help.status.inProgress,
-  skipped: strings.help.status.skipped,
-  not_started: strings.help.status.notStarted,
-};
 
 const useStyles = makeStyles((t) =>
   StyleSheet.create({
@@ -57,6 +51,13 @@ export function HelpScreen() {
   const styles = useStyles();
   const router = useRouter();
   const { tokens } = useTheme();
+  const strings = useStrings();
+  const STATUS_LABEL: Record<TutorialStatus, string> = {
+    completed: strings.help.status.completed,
+    in_progress: strings.help.status.inProgress,
+    skipped: strings.help.status.skipped,
+    not_started: strings.help.status.notStarted,
+  };
   const tutorials = useTutorialStore((s) => s.progress.tutorials);
   const tutorialMode = useTutorialStore((s) => s.progress.tutorialMode);
   const tourOffer = useTutorialStore((s) => s.progress.tourOffer);
@@ -107,6 +108,19 @@ export function HelpScreen() {
             </Pressable>
           );
         })}
+      </ListSection>
+      <ListSection title={strings.help.articlesSection}>
+        <Pressable
+          onPress={() => router.push('/settings/help/maintenance-dates' as never)}
+          accessibilityRole="button"
+          accessibilityLabel={strings.help.maintenanceDates.rowTitle}
+          style={({ pressed }) => [styles.row, pressed && { opacity: 0.7 }]}>
+          <Icon name="calendarClock" size={tokens.iconSize.listLeading} />
+          <View style={styles.rowBody}>
+            <Text style={styles.rowLabel}>{strings.help.maintenanceDates.rowTitle}</Text>
+          </View>
+          <Icon name="chevronRight" size={tokens.iconSize.inline} color={tokens.icon.secondary} />
+        </Pressable>
       </ListSection>
       <ListSection title={strings.help.optionsSection}>
         <Toggle

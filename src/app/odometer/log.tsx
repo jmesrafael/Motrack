@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { Card } from '@/components/Card';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
+import { DestructiveButton } from '@/components/DestructiveButton';
 import { OdoInput } from '@/components/OdoInput';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { Screen } from '@/components/Screen';
@@ -11,7 +12,7 @@ import { SecondaryButton } from '@/components/SecondaryButton';
 import { showToast } from '@/components/Toast';
 import { OdometerRepository } from '@/db/repositories/OdometerRepository';
 import { useActiveBike } from '@/hooks/useActiveBike';
-import { formatMonthDay } from '@/lib/format';
+import { formatMonthDay, formatOdometerSource } from '@/lib/format';
 import { OdometerService } from '@/services/OdometerService';
 import { makeStyles, typeStyle } from '@/theme/styles';
 
@@ -21,7 +22,7 @@ const useStyles = makeStyles((t) =>
     row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
     caption: typeStyle(t.type.caption, t.text.secondary),
     reading: { ...typeStyle(t.type.bodyStrong, t.text.primary), fontVariant: ['tabular-nums'] },
-    editRow: { flexDirection: 'row', gap: t.space.s2, marginTop: t.space.s2 },
+    editRow: { flexDirection: 'row', alignItems: 'center', gap: t.space.s2, marginTop: t.space.s2 },
   }),
 );
 
@@ -77,7 +78,7 @@ export default function OdometerLogListRoute() {
             <View>
               <Text style={styles.reading}>{log.readingKm.toLocaleString('en-PH')} km</Text>
               <Text style={styles.caption}>
-                {formatMonthDay(log.recordedDate)} · {log.source}
+                {formatMonthDay(log.recordedDate)} · {formatOdometerSource(log.source)}
               </Text>
             </View>
             {editingId !== log.id ? (
@@ -93,8 +94,8 @@ export default function OdometerLogListRoute() {
           {editingId === log.id ? (
             <View style={styles.editRow}>
               <OdoInput value={editValue} onChange={setEditValue} />
-              <PrimaryButton label="Save" onPress={() => handleSaveEdit(log.id)} />
-              <SecondaryButton label="Delete" onPress={() => setDeletingId(log.id)} />
+              <PrimaryButton label="Save" size="md" onPress={() => handleSaveEdit(log.id)} />
+              <DestructiveButton label="Delete" size="md" block={false} onPress={() => setDeletingId(log.id)} />
             </View>
           ) : null}
         </Card>

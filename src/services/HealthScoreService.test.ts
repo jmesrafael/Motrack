@@ -19,6 +19,9 @@ function makeSchedule(overrides: Partial<ScheduleRow>): ScheduleRow {
     anchorOdometerKm: null,
     anchorDate: null,
     anchorSource: 'record',
+    isPinned: 0,
+    pinnedSortOrder: 0,
+    sortOrder: 0,
     ...overrides,
   };
 }

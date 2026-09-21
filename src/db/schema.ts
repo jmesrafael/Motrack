@@ -47,6 +47,11 @@ export const maintenanceSchedules = sqliteTable('maintenance_schedules', {
   anchorOdometerKm: integer('anchor_odometer_km'),
   anchorDate: text('anchor_date'),
   anchorSource: text('anchor_source'),
+  /** Pinned to the Dashboard "Quick Logs" section (migration 0002). */
+  isPinned: integer('is_pinned').notNull().default(0),
+  pinnedSortOrder: integer('pinned_sort_order').notNull().default(0),
+  /** Custom Components drag-and-drop order, reusable anywhere components list (migration 0002). */
+  sortOrder: integer('sort_order').notNull().default(0),
 });
 
 export const maintenanceRecords = sqliteTable('maintenance_records', {
@@ -83,11 +88,16 @@ export const repairs = sqliteTable('repairs', {
 export const expenses = sqliteTable('expenses', {
   ...syncColumns,
   motorcycleId: text('motorcycle_id').notNull(),
+  /** Free-form since migration 0002 (was a closed enum) so users can add their own categories. */
   category: text('category').notNull(),
   amountCentavos: integer('amount_centavos').notNull(),
   expenseDate: text('expense_date').notNull(),
   notes: text('notes'),
-  photoPath: text('photo_path'),
+  /** JSON array of relative file paths (migration 0002; replaces the old single photo_path). */
+  images: text('images'),
+  buildId: text('build_id'),
+  /** Optional link to the maintenance component this expense was for (migration 0003). */
+  scheduleId: text('schedule_id'),
 });
 
 export const fuelLogs = sqliteTable('fuel_logs', {
@@ -122,6 +132,37 @@ export const documents = sqliteTable('documents', {
   fileSize: integer('file_size').notNull(),
   expiryDate: text('expiry_date'),
   notes: text('notes'),
+  /** e.g. OR/CR or policy number (migration 0002). */
+  documentNumber: text('document_number'),
+  /** Optional external URL, e.g. the LTO portal (migration 0002). */
+  link: text('link'),
+  /** JSON array of {path, mimeType, size} for images beyond the first (migration 0002). */
+  extraFiles: text('extra_files'),
+});
+
+export const builds = sqliteTable('builds', {
+  ...syncColumns,
+  motorcycleId: text('motorcycle_id').notNull(),
+  name: text('name').notNull(),
+  description: text('description'),
+  coverPhoto: text('cover_photo'),
+  budgetCentavos: integer('budget_centavos'),
+  sortOrder: integer('sort_order').notNull().default(0),
+});
+
+export const buildPlanItems = sqliteTable('build_plan_items', {
+  ...syncColumns,
+  buildId: text('build_id').notNull(),
+  name: text('name').notNull(),
+  estimatedPriceCentavos: integer('estimated_price_centavos'),
+  /** JSON array of relative file paths (photos/screenshots). */
+  photos: text('photos'),
+  productLink: text('product_link'),
+  notes: text('notes'),
+  priority: text('priority').notNull().default('normal'),
+  isAcquired: integer('is_acquired').notNull().default(0),
+  acquiredExpenseId: text('acquired_expense_id'),
+  sortOrder: integer('sort_order').notNull().default(0),
 });
 
 /** Operational — no soft delete, excluded from backup (DATABASE_DESIGN.md §5.9). */
@@ -150,3 +191,5 @@ export type FuelLogRow = typeof fuelLogs.$inferSelect;
 export type OdometerLogRow = typeof odometerLogs.$inferSelect;
 export type DocumentRow = typeof documents.$inferSelect;
 export type AppSettingRow = typeof appSettings.$inferSelect;
+export type BuildRow = typeof builds.$inferSelect;
+export type BuildPlanItemRow = typeof buildPlanItems.$inferSelect;

@@ -5,6 +5,12 @@ import { documents, type DocumentRow } from '@/db/schema';
 import type { DocType } from '@/types/enums';
 import { guard, insertMeta, softDeleteMeta, touchMeta } from './base';
 
+export interface DocFile {
+  path: string;
+  mimeType: string;
+  size: number;
+}
+
 export interface NewDocument {
   motorcycleId: string | null;
   docType: DocType;
@@ -14,9 +20,30 @@ export interface NewDocument {
   fileSize: number;
   expiryDate: string | null;
   notes: string | null;
+  documentNumber: string | null;
+  link: string | null;
+  /** Images beyond the first (item 20), stored as JSON. */
+  extraFiles: DocFile[] | null;
 }
 
-export type DocumentUpdate = Partial<Pick<NewDocument, 'title' | 'expiryDate' | 'notes' | 'docType'>>;
+export type DocumentUpdate = Partial<
+  Pick<NewDocument, 'title' | 'expiryDate' | 'notes' | 'docType' | 'documentNumber' | 'link'>
+>;
+
+/** Every attached image as one ordered list: the primary file first, then extraFiles. */
+export function allFiles(doc: Pick<DocumentRow, 'filePath' | 'mimeType' | 'fileSize' | 'extraFiles'>): DocFile[] {
+  const primary: DocFile = { path: doc.filePath, mimeType: doc.mimeType, size: doc.fileSize };
+  if (doc.extraFiles === null) {
+    return [primary];
+  }
+  try {
+    const parsed: unknown = JSON.parse(doc.extraFiles);
+    const extras = Array.isArray(parsed) ? (parsed as DocFile[]) : [];
+    return [primary, ...extras];
+  } catch {
+    return [primary];
+  }
+}
 
 const notDeleted = isNull(documents.deletedAt);
 
@@ -67,7 +94,11 @@ export const DocumentRepository = {
 
   insert(input: NewDocument): DocumentRow {
     return guard('documents.insert', () => {
-      const row = { ...insertMeta(), ...input };
+      const row = {
+        ...insertMeta(),
+        ...input,
+        extraFiles: input.extraFiles !== null ? JSON.stringify(input.extraFiles) : null,
+      };
       db.insert(documents).values(row).run();
       return row as DocumentRow;
     });
@@ -81,6 +112,26 @@ export const DocumentRepository = {
         .where(eq(documents.id, id))
         .run(),
     );
+  },
+
+  /** Replaces the full ordered image list (item 20: add/replace/remove); `files[0]` becomes the primary file. */
+  updateFiles(id: string, files: readonly DocFile[]): void {
+    guard('documents.updateFiles', () => {
+      const [primary, ...extras] = files;
+      if (primary === undefined) {
+        return;
+      }
+      db.update(documents)
+        .set({
+          filePath: primary.path,
+          mimeType: primary.mimeType,
+          fileSize: primary.size,
+          extraFiles: extras.length > 0 ? JSON.stringify(extras) : null,
+          ...touchMeta(),
+        })
+        .where(eq(documents.id, id))
+        .run();
+    });
   },
 
   softDelete(id: string): void {

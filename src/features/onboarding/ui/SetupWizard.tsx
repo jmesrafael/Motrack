@@ -12,12 +12,12 @@ import { PrimaryButton } from '@/components/PrimaryButton';
 import { Screen } from '@/components/Screen';
 import { SecondaryButton } from '@/components/SecondaryButton';
 import { showToast } from '@/components/Toast';
-import { Toggle } from '@/components/Toggle';
 import { ScheduleRepository } from '@/db/repositories/ScheduleRepository';
 import type { MotorcycleRow } from '@/db/schema';
 import { componentDefaultServiceType } from '@/db/seed/defaults';
 import { BikeForm, toMotorcycleInput, type BikeFormValues } from '@/features/garage/ui/BikeForm';
-import { interpolate, strings } from '@/i18n/strings';
+import { interpolate } from '@/i18n/strings';
+import { useStrings } from '@/i18n/useStrings';
 import { todayIso } from '@/lib/dates';
 import { MaintenanceService } from '@/services/MaintenanceService';
 import { MotorcycleService } from '@/services/MotorcycleService';
@@ -31,17 +31,17 @@ import type { ComponentType } from '@/types/enums';
  * welcome, wizard Back walks steps). Non-negotiables from the onboarding
  * spec: every step has Back / Skip / X-exit, abandoning keeps whatever was
  * already saved, and skipping opens the app normally.
+ *
+ * Step 3 used to also collect "recent maintenance" (a toggle per component
+ * plus a shared date that got written as each one's last-serviced date).
+ * That mixed "add a bike" with a second, confusing data-entry concept during
+ * first run, so it was removed: maintenance dates/baselines are entered the
+ * same way any existing user does it, from the component screen in
+ * Maintenance ("Just serviced today" / "Save baseline"), with the concept
+ * explained in Help & Tutorials instead of during setup.
  */
 
-type WizardStep = 'bike' | 'oil' | 'initial' | 'done';
-
-const INITIAL_COMPONENT_OPTIONS: ComponentType[] = [
-  'air_filter_clean',
-  'spark_plug',
-  'brake_fluid',
-  'cvt_cleaning',
-  'chain_lube',
-];
+type WizardStep = 'bike' | 'oil' | 'done';
 
 const useStyles = makeStyles((t) =>
   StyleSheet.create({
@@ -67,6 +67,7 @@ const useStyles = makeStyles((t) =>
     },
     stepTitle: typeStyle(t.type.h2, t.text.primary),
     stepBody: typeStyle(t.type.body, t.text.secondary),
+    stepWhy: { ...typeStyle(t.type.caption, t.text.tertiary), marginTop: -t.space.s2 },
     error: typeStyle(t.type.caption, t.feedback.error.base),
     success: typeStyle(t.type.caption, t.feedback.success.base),
     footer: {
@@ -77,7 +78,7 @@ const useStyles = makeStyles((t) =>
     },
     footerSpacer: { flex: 1 },
     skipButton: {
-      minHeight: 44,
+      minHeight: t.size.buttonMd,
       justifyContent: 'center',
       paddingHorizontal: t.space.s2,
     },
@@ -102,6 +103,7 @@ export function SetupWizard() {
   const styles = useStyles();
   const router = useRouter();
   const { tokens } = useTheme();
+  const strings = useStrings();
   const markSetup = useTutorialStore((s) => s.markSetup);
 
   const [step, setStep] = useState<WizardStep>('bike');
@@ -118,15 +120,7 @@ export function SetupWizard() {
   const [oilOdo, setOilOdo] = useState('');
   const [oilMessage, setOilMessage] = useState<{ kind: 'error' | 'success'; text: string }>();
 
-  // Initial maintenance step state
-  const [selected, setSelected] = useState<Set<ComponentType>>(new Set());
-  const [initialDate, setInitialDate] = useState(todayIso());
-  const [initialMessage, setInitialMessage] = useState<{
-    kind: 'error' | 'success';
-    text: string;
-  }>();
-
-  const stepOrder: WizardStep[] = ['bike', 'oil', 'initial', 'done'];
+  const stepOrder: WizardStep[] = ['bike', 'oil', 'done'];
   const stepIndex = stepOrder.indexOf(step);
 
   const finish = (outcome: 'completed' | 'skipped') => {
@@ -190,7 +184,7 @@ export function SetupWizard() {
 
   const saveOilChange = () => {
     if (bike === null) {
-      setStep('initial');
+      setStep('done');
       return;
     }
     const odo = oilOdo.trim() !== '' ? Number(oilOdo) : null;
@@ -200,53 +194,13 @@ export function SetupWizard() {
       return;
     }
     setOilMessage({ kind: 'success', text: strings.onboarding.setup.oil.saved });
-    setStep('initial');
-  };
-
-  const saveInitialMaintenance = () => {
-    if (bike === null || selected.size === 0) {
-      setStep('done');
-      return;
-    }
-    let saved = 0;
-    let firstError: string | null = null;
-    for (const componentType of selected) {
-      const error = recordService(bike, componentType, initialDate, null);
-      if (error === null) {
-        saved += 1;
-      } else if (firstError === null) {
-        firstError = error;
-      }
-    }
-    if (firstError !== null && saved === 0) {
-      setInitialMessage({ kind: 'error', text: firstError });
-      return;
-    }
-    setInitialMessage({
-      kind: 'success',
-      text: interpolate(strings.onboarding.setup.initial.saved, { count: saved }),
-    });
     setStep('done');
-  };
-
-  const toggleComponent = (componentType: ComponentType) => {
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (next.has(componentType)) {
-        next.delete(componentType);
-      } else {
-        next.add(componentType);
-      }
-      return next;
-    });
   };
 
   const skipStep = () => {
     if (step === 'bike') {
       finish('skipped');
     } else if (step === 'oil') {
-      setStep('initial');
-    } else if (step === 'initial') {
       setStep('done');
     }
   };
@@ -283,6 +237,7 @@ export function SetupWizard() {
         <>
           <Text style={styles.stepTitle}>{strings.onboarding.setup.bike.title}</Text>
           <Text style={styles.stepBody}>{strings.onboarding.setup.bike.body}</Text>
+          <Text style={styles.stepWhy}>{strings.onboarding.setup.bike.why}</Text>
           {bikeError !== undefined ? <Text style={styles.error}>{bikeError}</Text> : null}
           <BikeForm
             submitLabel={strings.onboarding.setup.next}
@@ -297,6 +252,7 @@ export function SetupWizard() {
         <>
           <Text style={styles.stepTitle}>{strings.onboarding.setup.oil.title}</Text>
           <Text style={styles.stepBody}>{strings.onboarding.setup.oil.body}</Text>
+          <Text style={styles.stepWhy}>{strings.onboarding.setup.oil.why}</Text>
           <FormField label={strings.onboarding.setup.oil.dateLabel}>
             <DateField value={oilDate} onChange={setOilDate} maxIso={todayIso()} />
           </FormField>
@@ -309,33 +265,6 @@ export function SetupWizard() {
             </Text>
           ) : null}
           <PrimaryButton label={strings.onboarding.setup.oil.save} onPress={saveOilChange} />
-        </>
-      ) : null}
-
-      {step === 'initial' ? (
-        <>
-          <Text style={styles.stepTitle}>{strings.onboarding.setup.initial.title}</Text>
-          <Text style={styles.stepBody}>{strings.onboarding.setup.initial.body}</Text>
-          {INITIAL_COMPONENT_OPTIONS.map((componentType) => (
-            <Toggle
-              key={componentType}
-              label={strings.components[componentType]}
-              value={selected.has(componentType)}
-              onChange={() => toggleComponent(componentType)}
-            />
-          ))}
-          <FormField label={strings.onboarding.setup.initial.dateLabel}>
-            <DateField value={initialDate} onChange={setInitialDate} maxIso={todayIso()} />
-          </FormField>
-          {initialMessage !== undefined ? (
-            <Text style={initialMessage.kind === 'error' ? styles.error : styles.success}>
-              {initialMessage.text}
-            </Text>
-          ) : null}
-          <PrimaryButton
-            label={strings.onboarding.setup.initial.save}
-            onPress={saveInitialMaintenance}
-          />
         </>
       ) : null}
 

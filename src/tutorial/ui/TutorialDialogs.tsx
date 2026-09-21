@@ -2,7 +2,7 @@ import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { SecondaryButton } from '@/components/SecondaryButton';
-import { strings } from '@/i18n/strings';
+import { useStrings } from '@/i18n/useStrings';
 import { makeStyles, typeStyle } from '@/theme/styles';
 
 /**
@@ -32,7 +32,7 @@ const useStyles = makeStyles((t) =>
     body: typeStyle(t.type.body, t.text.secondary),
     actions: { gap: t.space.s2, marginTop: t.space.s2 },
     tertiaryButton: {
-      minHeight: 44,
+      minHeight: t.size.buttonMd,
       alignItems: 'center',
       justifyContent: 'center',
     },
@@ -97,6 +97,7 @@ export interface TourOfferDialogProps {
 }
 
 export function TourOfferDialog({ visible, onStart, onLater, onNever }: TourOfferDialogProps) {
+  const strings = useStrings();
   return (
     <ChoiceDialog
       visible={visible}
@@ -120,6 +121,7 @@ export interface ResumeDialogProps {
 }
 
 export function ResumeDialog({ visible, onResume, onRestart, onDismiss }: ResumeDialogProps) {
+  const strings = useStrings();
   return (
     <ChoiceDialog
       visible={visible}

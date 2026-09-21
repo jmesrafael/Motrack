@@ -78,6 +78,9 @@ function fullFixture(): Record<BackupTableName, Record<string, unknown>[]> {
         anchor_odometer_km: 4000,
         anchor_date: null,
         anchor_source: 'record',
+        is_pinned: 0,
+        pinned_sort_order: 0,
+        sort_order: 0,
       },
     ],
     maintenance_records: [
@@ -115,6 +118,18 @@ function fullFixture(): Record<BackupTableName, Record<string, unknown>[]> {
         notes: null,
       },
     ],
+    builds: [
+      {
+        id: 'bd1',
+        ...syncCols,
+        motorcycle_id: 'b1',
+        name: 'Classic Build',
+        description: null,
+        cover_photo: null,
+        budget_centavos: 500000,
+        sort_order: 0,
+      },
+    ],
     expenses: [
       {
         id: 'e1',
@@ -124,7 +139,9 @@ function fullFixture(): Record<BackupTableName, Record<string, unknown>[]> {
         amount_centavos: 2000,
         expense_date: '2026-01-02',
         notes: null,
-        photo_path: null,
+        images: null,
+        build_id: null,
+        schedule_id: null,
       },
     ],
     fuel_logs: [
@@ -165,6 +182,25 @@ function fullFixture(): Record<BackupTableName, Record<string, unknown>[]> {
         file_size: 12345,
         expiry_date: '2027-01-01',
         notes: null,
+        document_number: null,
+        link: null,
+        extra_files: null,
+      },
+    ],
+    build_plan_items: [
+      {
+        id: 'pi1',
+        ...syncCols,
+        build_id: 'bd1',
+        name: 'Aftermarket exhaust',
+        estimated_price_centavos: 800000,
+        photos: null,
+        product_link: null,
+        notes: null,
+        priority: 'normal',
+        is_acquired: 0,
+        acquired_expense_id: null,
+        sort_order: 0,
       },
     ],
   };

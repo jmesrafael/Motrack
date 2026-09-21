@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Animated, FlatList, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/Icon';
 import { PressableScale } from '@/components/PressableScale';
@@ -42,7 +43,6 @@ const useStyles = makeStyles((t) =>
       borderTopLeftRadius: t.radius.xl,
       borderTopRightRadius: t.radius.xl,
       maxHeight: '70%',
-      paddingBottom: t.space.s6,
       paddingTop: t.space.s2,
       ...shadow(t.elevation.sheet),
     },
@@ -76,6 +76,7 @@ export function PickerField<T extends string>({
 }: PickerFieldProps<T>) {
   const styles = useStyles();
   const { tokens } = useTheme();
+  const insets = useSafeAreaInsets();
   const reduceMotion = useReducedMotion();
   const [open, setOpen] = useState(false);
   const [y] = useState(() => new Animated.Value(400));
@@ -114,7 +115,11 @@ export function PickerField<T extends string>({
       </PressableScale>
       <Modal visible={open} transparent animationType="fade" onRequestClose={close}>
         <Pressable style={styles.backdrop} onPress={close}>
-          <Animated.View style={[styles.sheet, { transform: [{ translateY: y }] }]}>
+          <Animated.View
+            style={[
+              styles.sheet,
+              { paddingBottom: tokens.space.s6 + insets.bottom, transform: [{ translateY: y }] },
+            ]}>
             <View style={styles.grabber} />
             <FlatList
               data={options}

@@ -7,11 +7,16 @@ import { guard, insertMeta, softDeleteMeta, touchMeta } from './base';
 
 export interface NewExpense {
   motorcycleId: string;
-  category: ExpenseCategory;
+  /** Free-form since migration 0002 — built-in ExpenseCategory values remain valid, plus user-added ones. */
+  category: ExpenseCategory | string;
   amountCentavos: number;
   expenseDate: string;
   notes: string | null;
-  photoPath: string | null;
+  /** Relative file paths (FileAdapter), stored as a JSON array. */
+  images: string[] | null;
+  buildId: string | null;
+  /** Optional link to the maintenance component this expense was for (migration 0003). */
+  scheduleId: string | null;
 }
 
 export type ExpenseUpdate = Partial<Omit<NewExpense, 'motorcycleId'>>;
@@ -22,7 +27,8 @@ export interface UnifiedExpenseRow {
   source: 'fuel' | 'maintenance' | 'repair' | 'expense';
   motorcycleId: string;
   date: string;
-  category: ExpenseCategory;
+  /** Free-form since migration 0002 for standalone expenses; derived rows (fuel/maintenance/repair) still use the fixed buckets from UNION_SQL below. */
+  category: ExpenseCategory | string;
   amountCentavos: number;
   /** component_type for maintenance rows, title for repairs, station for fuel, notes for expenses. */
   label: string | null;
@@ -32,13 +38,13 @@ export interface UnifiedFilter {
   motorcycleId?: string;
   /** 'YYYY-MM' month scope. */
   month?: string;
-  category?: ExpenseCategory;
+  category?: ExpenseCategory | string;
   limit?: number;
   offset?: number;
 }
 
 export interface CategoryTotal {
-  category: ExpenseCategory;
+  category: ExpenseCategory | string;
   totalCentavos: number;
 }
 
@@ -121,19 +127,73 @@ export const ExpenseRepository = {
 
   insert(input: NewExpense): ExpenseRow {
     return guard('expenses.insert', () => {
-      const row = { ...insertMeta(), ...input };
+      const row = {
+        ...insertMeta(),
+        ...input,
+        images: input.images !== null ? JSON.stringify(input.images) : null,
+      };
       db.insert(expenses).values(row).run();
       return row as ExpenseRow;
     });
   },
 
   update(id: string, changes: ExpenseUpdate): void {
+    const { images, ...rest } = changes;
     guard('expenses.update', () =>
       db
         .update(expenses)
-        .set({ ...changes, ...touchMeta() })
+        .set({
+          ...rest,
+          ...(images !== undefined ? { images: images !== null ? JSON.stringify(images) : null } : {}),
+          ...touchMeta(),
+        })
         .where(eq(expenses.id, id))
         .run(),
+    );
+  },
+
+  /** Built-in categories are always offered; this adds whatever custom ones are already in use, deduped case-insensitively by the caller. */
+  listDistinctCategories(): string[] {
+    return guard('expenses.listDistinctCategories', () =>
+      rawDb
+        .getAllSync<{ category: string }>(
+          `SELECT DISTINCT category FROM expenses WHERE deleted_at IS NULL ORDER BY category COLLATE NOCASE`,
+        )
+        .map((r) => r.category),
+    );
+  },
+
+  listByBuild(buildId: string): ExpenseRow[] {
+    return guard('expenses.listByBuild', () =>
+      db
+        .select()
+        .from(expenses)
+        .where(and(eq(expenses.buildId, buildId), notDeleted))
+        .orderBy(desc(expenses.expenseDate))
+        .all(),
+    );
+  },
+
+  listBySchedule(scheduleId: string): ExpenseRow[] {
+    return guard('expenses.listBySchedule', () =>
+      db
+        .select()
+        .from(expenses)
+        .where(and(eq(expenses.scheduleId, scheduleId), notDeleted))
+        .orderBy(desc(expenses.expenseDate))
+        .all(),
+    );
+  },
+
+  buildTotal(buildId: string): number {
+    return guard(
+      'expenses.buildTotal',
+      () =>
+        db
+          .select({ total: sql<number>`COALESCE(SUM(${expenses.amountCentavos}), 0)` })
+          .from(expenses)
+          .where(and(eq(expenses.buildId, buildId), notDeleted))
+          .get()?.total ?? 0,
     );
   },
 

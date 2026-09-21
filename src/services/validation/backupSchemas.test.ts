@@ -39,10 +39,12 @@ describe('backupDataSchema', () => {
       maintenance_schedules: [],
       maintenance_records: [],
       repairs: [],
+      builds: [],
       expenses: [],
       fuel_logs: [],
       odometer_logs: [],
       documents: [],
+      build_plan_items: [],
       app_settings: [],
     };
   }
@@ -111,6 +113,9 @@ describe('backupDataSchema', () => {
           file_size: 100,
           expiry_date: null,
           notes: null,
+          document_number: null,
+          link: null,
+          extra_files: null,
         },
       ],
     };

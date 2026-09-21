@@ -7,6 +7,8 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { AppState } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { AppLoadingScreen } from '@/components/AppLoadingScreen';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -127,8 +129,12 @@ function StartupGate() {
 
 export default function RootLayout() {
   return (
-    <ThemeProvider>
-      <StartupGate />
-    </ThemeProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <StartupGate />
+        </ThemeProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }

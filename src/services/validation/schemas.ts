@@ -7,13 +7,7 @@
 import { z } from 'zod';
 
 import { isFutureDate } from '@/lib/dates';
-import {
-  COMPONENT_TYPES,
-  DOC_TYPES,
-  DRIVETRAIN_TYPES,
-  EXPENSE_CATEGORIES,
-  SERVICE_TYPES,
-} from '@/types/enums';
+import { COMPONENT_TYPES, DOC_TYPES, DRIVETRAIN_TYPES, SERVICE_TYPES } from '@/types/enums';
 
 const MAX_ODOMETER_KM = 999_999;
 const MAX_MONEY_CENTAVOS = 999_999_999; // ₱9,999,999.99 (FEATURE_SPECIFICATIONS.md §1)
@@ -70,12 +64,22 @@ export const fuelLogInput = z.object({
 });
 export type FuelLogInput = z.infer<typeof fuelLogInput>;
 
+/** Free-form since migration 0002: trimmed, collapsed whitespace, 1-30 chars — built-in EXPENSE_CATEGORIES remain valid values too. */
+const expenseCategory = z
+  .string()
+  .trim()
+  .min(1, 'categoryRequired')
+  .max(30)
+  .transform((s) => s.replace(/\s+/g, ' '));
+
 export const expenseInput = z.object({
-  category: z.enum(EXPENSE_CATEGORIES),
+  category: expenseCategory,
   amountCentavos: money.min(1, 'amountRequired'),
   expenseDate: pastOrTodayDate,
   notes: notes.nullable(),
-  photoPath: z.string().nullable(),
+  images: z.array(z.string()).max(6).nullable(),
+  buildId: z.string().nullable(),
+  scheduleId: z.string().nullable(),
 });
 export type ExpenseInput = z.infer<typeof expenseInput>;
 
@@ -92,13 +96,23 @@ export const repairInput = z.object({
 });
 export type RepairInput = z.infer<typeof repairInput>;
 
+const optionalUrl = z
+  .string()
+  .trim()
+  .max(500)
+  .refine((s) => s === '' || /^https?:\/\/.+/i.test(s), { message: 'invalidUrl' })
+  .transform((s) => (s === '' ? null : s))
+  .nullable();
+
 export const documentInput = z.object({
   motorcycleId: z.string().nullable(),
   docType: z.enum(DOC_TYPES),
   title: z.string().trim().min(1).max(60),
+  documentNumber: z.string().trim().max(40).nullable(),
   // Expiry may be future — that is its purpose (FEATURE_SPECIFICATIONS.md §1).
   expiryDate: isoDate.nullable(),
   notes: notes.nullable(),
+  link: optionalUrl,
 });
 export type DocumentInput = z.infer<typeof documentInput>;
 
@@ -141,3 +155,21 @@ export const baselineInput = z.object({
 export type BaselineInput = z.infer<typeof baselineInput>;
 
 export const componentTypeSchema = z.enum(COMPONENT_TYPES);
+
+export const buildInput = z.object({
+  name: z.string().trim().min(1).max(50),
+  description: z.string().trim().max(500).nullable(),
+  coverPhoto: z.string().nullable(),
+  budgetCentavos: money.nullable(),
+});
+export type BuildInput = z.infer<typeof buildInput>;
+
+export const buildPlanItemInput = z.object({
+  name: z.string().trim().min(1).max(60),
+  estimatedPriceCentavos: money.nullable(),
+  photos: z.array(z.string()).max(6).nullable(),
+  productLink: optionalUrl,
+  notes: notes.nullable(),
+  priority: z.enum(['low', 'normal', 'high']),
+});
+export type BuildPlanItemInput = z.infer<typeof buildPlanItemInput>;

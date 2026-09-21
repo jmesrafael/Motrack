@@ -1,4 +1,5 @@
 import type { RefObject } from 'react';
+import { findNodeHandle, UIManager } from 'react-native';
 import type { ScrollView, View } from 'react-native';
 
 import type { TargetRect } from './types';
@@ -104,10 +105,29 @@ export function unregisterScroll(id: string, ref: RefObject<ScrollView | null>):
   }
 }
 
+/** Never lets a caller hang past `ms` even if the wrapped promise never settles. */
+function withTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Promise<T> {
+  return new Promise((resolve) => {
+    const timer = setTimeout(() => resolve(fallback), ms);
+    promise.then((value) => {
+      clearTimeout(timer);
+      resolve(value);
+    });
+  });
+}
+
 /**
  * Scrolls the anchor's container so the anchor sits comfortably in view, then
  * waits for the scroll to settle. No persistent onScroll listeners — position
- * is derived from measureLayout against the scroll content view.
+ * is derived from measureLayout against the scroll content view, resolved via
+ * UIManager.measureLayout (numeric node tags) rather than View.measureLayout,
+ * which on the New Architecture requires a host-instance object and silently
+ * no-ops (never calling either callback) when handed a raw numeric tag —
+ * exactly what ScrollView.getInnerViewNode() returns. That silent no-op used
+ * to leave this function's promise unresolved forever, which stalled the
+ * engine mid-step with the spotlight scrim stuck fully opaque. The whole
+ * measurement is additionally bounded by a hard timeout so no future
+ * platform quirk can reintroduce that hang.
  */
 export async function scrollAnchorIntoView(id: string, reduceMotion: boolean): Promise<void> {
   const entry = anchors.get(id);
@@ -117,20 +137,30 @@ export async function scrollAnchorIntoView(id: string, reduceMotion: boolean): P
   if (scrollView === null || scrollView === undefined || view === null || view === undefined) {
     return;
   }
-  const contentY = await new Promise<number | null>((resolve) => {
-    try {
-      const inner = scrollView.getInnerViewNode() as unknown as View;
-      view.measureLayout(
-        inner,
-        (_x, y) => resolve(y),
-        () => resolve(null),
-      );
-    } catch {
-      // Some platforms' ScrollView doesn't implement this native measure
-      // API — skip the scroll rather than let the rejection stall the step.
-      resolve(null);
-    }
-  });
+  const contentY = await withTimeout(
+    new Promise<number | null>((resolve) => {
+      try {
+        const viewTag = findNodeHandle(view);
+        const innerTag = findNodeHandle(scrollView.getInnerViewNode());
+        if (viewTag === null || innerTag === null) {
+          resolve(null);
+          return;
+        }
+        UIManager.measureLayout(
+          viewTag,
+          innerTag,
+          () => resolve(null),
+          (_x, y) => resolve(y),
+        );
+      } catch {
+        // Some platforms' ScrollView doesn't implement this native measure
+        // API — skip the scroll rather than let the rejection stall the step.
+        resolve(null);
+      }
+    }),
+    500,
+    null,
+  );
   if (contentY === null) {
     return;
   }

@@ -113,10 +113,16 @@ export function SpotlightOverlay({
       h.value = withTiming(frame.height, { duration });
       r.value = withTiming(frame.radius, { duration });
     }
-    scrimOpacity.value = withTiming(1, {
+    // `blocking` mirrors "a step is actually showing" (see TutorialHost).
+    // While a step is merely preparing (route/anchor wait, measurement, or a
+    // scroll-into-view still in flight) there is nothing valid to dim yet, so
+    // the scrim must stay invisible rather than defaulting to a full-screen
+    // dark cover — that default is what turned a transient loading gap into
+    // a permanently stuck dark screen whenever the wait chain stalled.
+    scrimOpacity.value = withTiming(blocking ? 1 : 0, {
       duration: reduceMotion ? 0 : tokens.motion.fast.durationMs,
     });
-  }, [frame.x, frame.y, frame.width, frame.height, frame.radius, rect, reduceMotion]);
+  }, [frame.x, frame.y, frame.width, frame.height, frame.radius, rect, reduceMotion, blocking]);
 
   const cutoutProps = useAnimatedProps(() => ({
     x: x.value,

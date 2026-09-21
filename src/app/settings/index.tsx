@@ -41,7 +41,7 @@ const THEME_OPTIONS = THEME_PREFERENCES.map((p) => ({
 const LANGUAGE_OPTIONS: { value: LanguagePreference; label: string }[] = [
   { value: 'system', label: 'System default' },
   { value: 'en', label: 'English' },
-  { value: 'fil', label: 'Filipino' },
+  { value: 'fil', label: 'Tagalog' },
 ];
 
 /** S-30/31/33 Settings — theme (registry-driven), language, data & privacy. */

@@ -28,7 +28,7 @@ const BRAND_OPTIONS = [
 
 const DRIVETRAIN_OPTIONS = DRIVETRAIN_TYPES.map((d) => ({
   value: d,
-  label: d === 'cvt' ? 'Automatic / scooter' : d === 'chain' ? 'Manual / chain' : 'Other',
+  label: d === 'cvt' ? 'Scooter' : d === 'chain' ? 'Chain' : 'Other',
 }));
 
 type TabKey = 'basics' | 'details';

@@ -34,7 +34,7 @@ const useStyles = makeStyles((t) =>
     },
     lg: { minHeight: t.size.buttonLg, paddingHorizontal: t.space.s6 },
     md: { minHeight: t.size.buttonMd },
-    sm: { minHeight: 36, paddingHorizontal: t.space.s4 },
+    sm: { minHeight: t.size.buttonSm, paddingHorizontal: t.space.s4 },
     block: { alignSelf: 'stretch' },
     inline: { alignSelf: 'flex-start' },
     primary: { backgroundColor: t.primary.base, ...shadow(t.elevation.accent) },

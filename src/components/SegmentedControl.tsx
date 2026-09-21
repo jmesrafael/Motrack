@@ -99,7 +99,9 @@ export function SegmentedControl<T extends string>({ segments, value, onChange }
             accessibilityRole="radio"
             accessibilityState={{ selected: active }}
             style={styles.segment}>
-            <Text style={[styles.label, active && styles.activeLabel]}>{segment.label}</Text>
+            <Text style={[styles.label, active && styles.activeLabel]} numberOfLines={1}>
+              {segment.label}
+            </Text>
           </Pressable>
         );
       })}
