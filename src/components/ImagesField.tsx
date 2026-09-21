@@ -1,8 +1,8 @@
-import * as ImagePicker from 'expo-image-picker';
 import { Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 import { Icon } from '@/components/Icon';
 import { SecondaryButton } from '@/components/SecondaryButton';
+import { pickImageFromCamera, pickImagesFromLibrary, type PickedAsset } from '@/lib/pickers';
 import { ImageStorage } from '@/services/imageStorage';
 import { makeStyles } from '@/theme/styles';
 import { useTheme } from '@/theme/useTheme';
@@ -51,34 +51,27 @@ export function ImagesField({ images, onChange, maxImages = 6, onViewImage }: Im
   const { tokens } = useTheme();
   const canAddMore = images.length < maxImages;
 
-  const addFromAssets = (assets: ImagePicker.ImagePickerAsset[]) => {
+  const addFromAssets = (assets: PickedAsset[]) => {
     const added = assets
       .slice(0, maxImages - images.length)
-      .map((asset) => ImageStorage.importPickedImage(asset.uri, asset.fileName ?? 'photo.jpg'));
+      .map((asset) => ImageStorage.importPickedImage(asset.uri, asset.name));
     if (added.length > 0) {
       onChange([...images, ...added]);
     }
   };
 
   const pickFromLibrary = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      quality: 0.7,
+    const assets = await pickImagesFromLibrary({
       allowsMultipleSelection: true,
       selectionLimit: Math.max(1, maxImages - images.length),
     });
-    if (!result.canceled) {
-      addFromAssets(result.assets);
-    }
+    addFromAssets(assets);
   };
 
   const pickFromCamera = async () => {
-    const permission = await ImagePicker.requestCameraPermissionsAsync();
-    if (!permission.granted) {
-      return;
-    }
-    const result = await ImagePicker.launchCameraAsync({ quality: 0.7 });
-    if (!result.canceled) {
-      addFromAssets(result.assets);
+    const result = await pickImageFromCamera();
+    if (result.status === 'captured') {
+      addFromAssets([result.asset]);
     }
   };
 

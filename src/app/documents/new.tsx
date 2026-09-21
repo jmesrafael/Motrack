@@ -1,5 +1,3 @@
-import * as DocumentPicker from 'expo-document-picker';
-import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Image, Text, View } from 'react-native';
@@ -17,6 +15,7 @@ import { showToast } from '@/components/Toast';
 import { useActiveBike } from '@/hooks/useActiveBike';
 import { strings } from '@/i18n/strings';
 import { todayIso } from '@/lib/dates';
+import { pickAnyFile, pickImageFromCamera, pickImagesFromLibrary } from '@/lib/pickers';
 import { DocumentService, type PickedFile } from '@/services/DocumentService';
 import { makeStyles, typeStyle } from '@/theme/styles';
 import { useTheme } from '@/theme/useTheme';
@@ -61,47 +60,25 @@ export default function AddDocumentRoute() {
   const canHaveExpiry = EXPIRY_DOC_TYPES.includes(docType);
 
   const pickFromLibrary = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      quality: 0.7,
-      allowsMultipleSelection: true,
-    });
-    if (!result.canceled) {
-      setFiles((prev) => [
-        ...prev,
-        ...result.assets.map((asset) => ({
-          uri: asset.uri,
-          name: asset.fileName ?? 'photo.jpg',
-          mimeType: asset.mimeType ?? 'image/jpeg',
-          size: asset.fileSize ?? 0,
-        })),
-      ]);
-    }
+    const assets = await pickImagesFromLibrary({ allowsMultipleSelection: true });
+    setFiles((prev) => [...prev, ...assets]);
   };
 
   const pickFromCamera = async () => {
-    const permission = await ImagePicker.requestCameraPermissionsAsync();
-    if (!permission.granted) {
+    const result = await pickImageFromCamera();
+    if (result.status === 'permissionDenied') {
       setError('Camera permission denied');
       return;
     }
-    const result = await ImagePicker.launchCameraAsync({ quality: 0.7 });
-    if (!result.canceled && result.assets[0] !== undefined) {
-      const asset = result.assets[0];
-      setFiles((prev) => [
-        ...prev,
-        { uri: asset.uri, name: asset.fileName ?? 'photo.jpg', mimeType: asset.mimeType ?? 'image/jpeg', size: asset.fileSize ?? 0 },
-      ]);
+    if (result.status === 'captured') {
+      setFiles((prev) => [...prev, result.asset]);
     }
   };
 
   const pickFile = async () => {
-    const result = await DocumentPicker.getDocumentAsync({ type: '*/*' });
-    if (!result.canceled && result.assets[0] !== undefined) {
-      const asset = result.assets[0];
-      setFiles((prev) => [
-        ...prev,
-        { uri: asset.uri, name: asset.name, mimeType: asset.mimeType ?? 'application/octet-stream', size: asset.size ?? 0 },
-      ]);
+    const asset = await pickAnyFile();
+    if (asset !== null) {
+      setFiles((prev) => [...prev, asset]);
     }
   };
 

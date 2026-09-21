@@ -8,6 +8,7 @@ import { DocumentRepository, type DocFile } from '@/db/repositories/DocumentRepo
 import type { DocumentRow } from '@/db/schema';
 import { emitDomainEvent } from '@/lib/events';
 import { log } from '@/lib/log';
+import type { PickedAsset } from '@/lib/pickers';
 import { appError, err, ok, type Result } from '@/lib/result';
 import { newUuid } from '@/lib/uuid';
 import { FileAdapter } from './adapters/files';
@@ -15,12 +16,8 @@ import { runTx } from './MaintenanceService';
 import { documentInput, type DocumentInput } from './validation/schemas';
 import { guardService, validateWith } from './serviceUtils';
 
-export interface PickedFile {
-  uri: string;
-  name: string;
-  mimeType: string;
-  size: number;
-}
+/** Same shape as the picker's PickedAsset — kept as its own export so callers don't need to know this service is picker-agnostic. */
+export type PickedFile = PickedAsset;
 
 function storeFile(file: PickedFile): Result<DocFile> {
   try {
