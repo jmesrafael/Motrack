@@ -42,6 +42,9 @@ const LANGUAGE_OPTIONS: { value: LanguagePreference; label: string }[] = [
   { value: 'system', label: 'System default' },
   { value: 'en', label: 'English' },
   { value: 'fil', label: 'Tagalog' },
+  { value: 'vi', label: 'Tiếng Việt' },
+  { value: 'id', label: 'Bahasa Indonesia' },
+  { value: 'th', label: 'ภาษาไทย' },
 ];
 
 /** S-30/31/33 Settings — theme (registry-driven), language, data & privacy. */

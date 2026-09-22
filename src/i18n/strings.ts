@@ -166,6 +166,12 @@ export const strings = {
       englishHint: 'Use English throughout the app',
       tagalog: 'Tagalog',
       tagalogHint: 'Use Tagalog throughout the app',
+      vietnamese: 'Tiếng Việt',
+      vietnameseHint: 'Use Vietnamese throughout the app',
+      indonesian: 'Bahasa Indonesia',
+      indonesianHint: 'Use Indonesian throughout the app',
+      thai: 'ภาษาไทย',
+      thaiHint: 'Use Thai throughout the app',
       continue: 'Continue',
     },
     setup: {

@@ -7,7 +7,7 @@ import { THEME_PREFERENCES, type ThemePreference } from '@/theme/registry';
 const THEME_KEY = 'theme';
 const LANGUAGE_KEY = 'language';
 
-export type LanguagePreference = 'system' | 'en' | 'fil';
+export type LanguagePreference = 'system' | 'en' | 'fil' | 'vi' | 'id' | 'th';
 
 interface SettingsState {
   themePreference: ThemePreference;

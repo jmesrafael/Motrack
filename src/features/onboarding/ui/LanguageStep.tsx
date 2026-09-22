@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Card } from '@/components/Card';
@@ -16,7 +16,8 @@ export interface LanguageStepProps {
 
 const useStyles = makeStyles((t) =>
   StyleSheet.create({
-    root: { flex: 1, backgroundColor: t.bg.page, paddingHorizontal: t.space.gutter, justifyContent: 'center' },
+    root: { flex: 1, backgroundColor: t.bg.page, paddingHorizontal: t.space.gutter },
+    scroll: { flexGrow: 1, justifyContent: 'center' },
     textBlock: { gap: t.space.s2, marginBottom: t.space.s6 },
     title: { ...typeStyle(t.type.h1, t.text.primary), textAlign: 'center' },
     body: { ...typeStyle(t.type.body, t.text.secondary), textAlign: 'center' },
@@ -77,11 +78,11 @@ function LanguageCard({
 }
 
 /**
- * First-run language choice: two clear options, English and Tagalog. Shown
- * before the onboarding carousel so the rest of first-run copy renders in
- * the picked language immediately. Pre-selects based on device language
- * (useStrings/resolveLocale already do this for 'system'); the user's
- * explicit pick is what gets saved, and it can be changed later in Settings.
+ * First-run language choice. Shown before the onboarding carousel so the
+ * rest of first-run copy renders in the picked language immediately.
+ * Pre-selects based on device language (useStrings/resolveLocale already do
+ * this for 'system'); the user's explicit pick is what gets saved, and it
+ * can be changed later in Settings.
  */
 export function LanguageStep({ onContinue }: LanguageStepProps) {
   const styles = useStyles();
@@ -91,6 +92,14 @@ export function LanguageStep({ onContinue }: LanguageStepProps) {
   const setLanguage = useSettingsStore((s) => s.setLanguage);
   const [choice, setChoice] = useState<Locale>(() => resolveLocale(language));
 
+  const languageChoices: { locale: Locale; label: string; hint: string }[] = [
+    { locale: 'en', label: strings.onboarding.language.english, hint: strings.onboarding.language.englishHint },
+    { locale: 'fil', label: strings.onboarding.language.tagalog, hint: strings.onboarding.language.tagalogHint },
+    { locale: 'vi', label: strings.onboarding.language.vietnamese, hint: strings.onboarding.language.vietnameseHint },
+    { locale: 'id', label: strings.onboarding.language.indonesian, hint: strings.onboarding.language.indonesianHint },
+    { locale: 'th', label: strings.onboarding.language.thai, hint: strings.onboarding.language.thaiHint },
+  ];
+
   const confirm = () => {
     setLanguage(choice);
     onContinue();
@@ -98,24 +107,23 @@ export function LanguageStep({ onContinue }: LanguageStepProps) {
 
   return (
     <View style={[styles.root, { paddingTop: insets.top, paddingBottom: insets.bottom + 24 }]}>
-      <View style={styles.textBlock}>
-        <Text style={styles.title}>{strings.onboarding.language.title}</Text>
-        <Text style={styles.body}>{strings.onboarding.language.body}</Text>
-      </View>
-      <View style={styles.cards}>
-        <LanguageCard
-          label={strings.onboarding.language.english}
-          hint={strings.onboarding.language.englishHint}
-          selected={choice === 'en'}
-          onPress={() => setChoice('en')}
-        />
-        <LanguageCard
-          label={strings.onboarding.language.tagalog}
-          hint={strings.onboarding.language.tagalogHint}
-          selected={choice === 'fil'}
-          onPress={() => setChoice('fil')}
-        />
-      </View>
+      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        <View style={styles.textBlock}>
+          <Text style={styles.title}>{strings.onboarding.language.title}</Text>
+          <Text style={styles.body}>{strings.onboarding.language.body}</Text>
+        </View>
+        <View style={styles.cards}>
+          {languageChoices.map((option) => (
+            <LanguageCard
+              key={option.locale}
+              label={option.label}
+              hint={option.hint}
+              selected={choice === option.locale}
+              onPress={() => setChoice(option.locale)}
+            />
+          ))}
+        </View>
+      </ScrollView>
       <PrimaryButton label={strings.onboarding.language.continue} onPress={confirm} />
     </View>
   );
