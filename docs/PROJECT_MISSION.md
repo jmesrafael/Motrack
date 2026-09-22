@@ -1,6 +1,6 @@
 # PROJECT_MISSION.md — Mission, Success Metrics, Business Philosophy
 
-> What Motrack exists to do and how we will know it is working. Product scope lives in [PRODUCT_REQUIREMENTS.md](PRODUCT_REQUIREMENTS.md); positioning and users in [PRODUCT_VISION.md](PRODUCT_VISION.md).
+> What Tolits exists to do and how we will know it is working. Product scope lives in [PRODUCT_REQUIREMENTS.md](PRODUCT_REQUIREMENTS.md); positioning and users in [PRODUCT_VISION.md](PRODUCT_VISION.md).
 
 ## 1. Mission
 
@@ -8,7 +8,7 @@ Help everyday motorcycle riders — commuters, delivery workers, and small fleet
 
 Core promise: **"Never forget motorcycle maintenance again."**
 
-The motorcycle is not a hobby object for our users; it is their livelihood and daily transport. A missed oil change is not an inconvenience — it is a blown engine that costs two weeks of delivery income. Motrack's job is to make staying on top of maintenance effortless for someone with no mechanical background, no patience for data entry, and an entry-level Android phone.
+The motorcycle is not a hobby object for our users; it is their livelihood and daily transport. A missed oil change is not an inconvenience — it is a blown engine that costs two weeks of delivery income. Tolits's job is to make staying on top of maintenance effortless for someone with no mechanical background, no patience for data entry, and an entry-level Android phone.
 
 ## 2. What "success" means
 
@@ -40,7 +40,7 @@ The motorcycle is not a hobby object for our users; it is their livelihood and d
 
 ## 4. Non-goals
 
-- Motrack is **not** a ride tracker / GPS logger (no location permission in MVP).
-- Motrack is **not** a social network in MVP (community is Phase 3, see [FUTURE_ROADMAP.md](FUTURE_ROADMAP.md)).
-- Motrack is **not** an enthusiast's dyno-sheet toolbox; modification tracking and lap timing are out of scope permanently unless the market demands otherwise.
-- Motrack does **not** diagnose safety-critical failures; AI Mechanic (Phase 2) suggests likely causes with explicit "see a mechanic" framing ([SECURITY.md](SECURITY.md) §8 — user safety).
+- Tolits is **not** a ride tracker / GPS logger (no location permission in MVP).
+- Tolits is **not** a social network in MVP (community is Phase 3, see [FUTURE_ROADMAP.md](FUTURE_ROADMAP.md)).
+- Tolits is **not** an enthusiast's dyno-sheet toolbox; modification tracking and lap timing are out of scope permanently unless the market demands otherwise.
+- Tolits does **not** diagnose safety-critical failures; AI Mechanic (Phase 2) suggests likely causes with explicit "see a mechanic" framing ([SECURITY.md](SECURITY.md) §8 — user safety).

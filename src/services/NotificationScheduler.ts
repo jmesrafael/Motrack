@@ -2,7 +2,7 @@
  * NotificationScheduler — the expo-notifications adapter side of
  * NOTIFICATION_ENGINE.md. Gathers rows via repositories, hands them to the
  * pure `planReminders`, then executes the plan against the OS: cancel
- * everything Motrack owns, schedule the fresh plan, persist the new
+ * everything Tolits owns, schedule the fresh plan, persist the new
  * `scheduled_notifications` rows (§5). Never throws — scheduling failures are
  * logged and swallowed (§9); the in-app Reminders list (S-05) remains the
  * source of truth regardless of whether this succeeded.
@@ -247,7 +247,7 @@ function buildContent(entry: PlanEntry, todayIso_: string): { title: string; bod
 
 /**
  * Runs the full re-plan cycle (NOTIFICATION_ENGINE.md §5): cancel everything
- * Motrack owns, compute the fresh plan, schedule it, persist the new rows.
+ * Tolits owns, compute the fresh plan, schedule it, persist the new rows.
  * Safe to call as often as needed — every domain event and app foreground.
  */
 export async function replanNotifications(): Promise<void> {

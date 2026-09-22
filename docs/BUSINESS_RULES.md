@@ -130,7 +130,7 @@ Stored in `maintenance_records.details` (JSON validated by per-component Zod sch
 
 ## 8. Documents & PH-specific rules
 
-- 8.1 Expiry-capable types: `orcr` (registration), `insurance`, `license`. Expiry drives reminders (30/7/1-day, [NOTIFICATION_ENGINE.md](NOTIFICATION_ENGINE.md) §7) and badges (S-26). Expiry is **user-entered**; Motrack never guesses a legal deadline.
+- 8.1 Expiry-capable types: `orcr` (registration), `insurance`, `license`. Expiry drives reminders (30/7/1-day, [NOTIFICATION_ENGINE.md](NOTIFICATION_ENGINE.md) §7) and badges (S-26). Expiry is **user-entered**; Tolits never guesses a legal deadline.
 - 8.2 **Registration month hint (PH):** when a plate number exists, the last digit hints the LTO renewal month (1→Jan … 0→Oct) — shown as a *suggestion* when setting OR/CR expiry ("Plates ending in 4 usually renew in April"). This mapping is config data (`config/ph.ts`), not hard-code, per the localization bet ([FUTURE_ROADMAP.md](FUTURE_ROADMAP.md)). It is a hint only (A-08).
 - 8.3 Registration/insurance expiry is **excluded from Health Score** (legal ≠ mechanical) but surfaces as Dashboard warnings (S-04) and reminders.
 

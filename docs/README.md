@@ -1,6 +1,6 @@
-# Motrack Knowledge Base — README
+# Tolits Knowledge Base — README
 
-**KB version: 1.2 (frozen 2026-07-06 — v1.0 baseline + independent CTO architecture review ([ARCHITECTURE_REVIEW.md](ARCHITECTURE_REVIEW.md)) + theme-engine expansion (D-018/ADR-028)).** This folder is the complete technical foundation of Motrack — a Philippines-first motorcycle maintenance tracker. It is written to be handed to a team (human or AI) that has never seen the project: every product, design, and architecture decision needed to build the app is in these files, with its reasoning. The docs are the **constitution**: implementation follows them, and they change *before* behavior does ([DEVELOPMENT_RULES.md](DEVELOPMENT_RULES.md) rule 8, [CONTRIBUTING.md](CONTRIBUTING.md) §1).
+**KB version: 1.2 (frozen 2026-07-06 — v1.0 baseline + independent CTO architecture review ([ARCHITECTURE_REVIEW.md](ARCHITECTURE_REVIEW.md)) + theme-engine expansion (D-018/ADR-028)).** This folder is the complete technical foundation of Tolits — a Philippines-first motorcycle maintenance tracker. It is written to be handed to a team (human or AI) that has never seen the project: every product, design, and architecture decision needed to build the app is in these files, with its reasoning. The docs are the **constitution**: implementation follows them, and they change *before* behavior does ([DEVELOPMENT_RULES.md](DEVELOPMENT_RULES.md) rule 8, [CONTRIBUTING.md](CONTRIBUTING.md) §1).
 
 ## 1. Start here
 

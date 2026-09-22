@@ -12,7 +12,7 @@ import { log } from '@/lib/log';
 import { MIGRATIONS } from './migrations';
 import { SEED_VERSION } from './seed/defaults';
 
-const DB_NAME = 'motrack.db';
+const DB_NAME = 'tolits.db';
 
 const sqlite: SQLiteDatabase = openDatabaseSync(DB_NAME);
 

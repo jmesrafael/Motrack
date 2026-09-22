@@ -1,6 +1,6 @@
 # PRODUCT_DECISIONS.md — Current Product Policy
 
-> **Status of this document:** This is the single quickest reference for how Motrack behaves **today**. It states the *current agreed policy* of the product. It is updated whenever a policy changes; the *history and reasoning* of each decision lives in [DECISION_LOG.md](DECISION_LOG.md) (product decisions) and [ARCHITECTURE_DECISIONS.md](ARCHITECTURE_DECISIONS.md) (technical decisions). If any other document appears to contradict this one, this document wins and the other document must be fixed.
+> **Status of this document:** This is the single quickest reference for how Tolits behaves **today**. It states the *current agreed policy* of the product. It is updated whenever a policy changes; the *history and reasoning* of each decision lives in [DECISION_LOG.md](DECISION_LOG.md) (product decisions) and [ARCHITECTURE_DECISIONS.md](ARCHITECTURE_DECISIONS.md) (technical decisions). If any other document appears to contradict this one, this document wins and the other document must be fixed.
 
 ---
 
@@ -8,7 +8,7 @@
 
 | Policy | Current decision |
 |---|---|
-| Product name | **Motrack** (provisional working title; branding pass pending — see [DECISION_LOG.md](DECISION_LOG.md) D-003) |
+| Product name | **Tolits** (provisional working title; branding pass pending — see [DECISION_LOG.md](DECISION_LOG.md) D-003) |
 | Mission | "Never forget motorcycle maintenance again" — see [PROJECT_MISSION.md](PROJECT_MISSION.md) |
 | Primary market | Philippines first; architecture must not hard-code PH-only behavior |
 | Primary users | Daily commuters, delivery riders, families/small businesses with 2–5 bikes, small fleets — see [USER_PERSONAS.md](USER_PERSONAS.md) |
@@ -79,7 +79,7 @@ No other tables exist in MVP. Adding a table requires updating [DATABASE_DESIGN.
 
 | Policy | Current decision |
 |---|---|
-| Model | **One-time lifetime purchase ("Motrack Pro")** — no subscription. Managed via RevenueCat non-consumable entitlement `pro`. ([DECISION_LOG.md](DECISION_LOG.md) D-002) |
+| Model | **One-time lifetime purchase ("Tolits Pro")** — no subscription. Managed via RevenueCat non-consumable entitlement `pro`. ([DECISION_LOG.md](DECISION_LOG.md) D-002) |
 | Free tier | All MVP features, up to **2 motorcycles**, manual backup/export included. |
 | Pro tier | Unlimited motorcycles + Phase 2 premium features as they ship (see [PREMIUM_SYSTEM.md](PREMIUM_SYSTEM.md) for the authoritative gate list). |
 | Price | Set in RevenueCat/store consoles, not hard-coded. Launch placeholder assumption: ₱499 (~USD 8.99) — needs owner confirmation. |

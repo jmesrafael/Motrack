@@ -52,7 +52,7 @@ export function RecoveryScreen({ onRetry }: RecoveryScreenProps) {
       </View>
       <Text style={styles.title}>Couldn&apos;t open your data</Text>
       <Text style={styles.body}>
-        Motrack couldn&apos;t prepare its database. Your data has not been touched. Try again, or contact support if
+        Tolits couldn&apos;t prepare its database. Your data has not been touched. Try again, or contact support if
         this keeps happening.
       </Text>
       <View style={styles.cta}>

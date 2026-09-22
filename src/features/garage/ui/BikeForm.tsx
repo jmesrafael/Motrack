@@ -158,7 +158,7 @@ export function BikeForm({ initial, fieldErrors, submitLabel, submitting, onSubm
             <FormField
               label="Current odometer (km)"
               error={fieldErrors?.currentOdometerKm}
-              hint="Optional, but it lets Motrack track wear from day one and alert you when things like an oil change are coming up.">
+              hint="Optional, but it lets Tolits track wear from day one and alert you when things like an oil change are coming up.">
               <OdoInput value={values.currentOdometerKm} onChange={(v) => set('currentOdometerKm', v)} />
             </FormField>
           ) : null}

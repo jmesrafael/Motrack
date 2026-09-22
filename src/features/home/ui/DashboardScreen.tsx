@@ -56,7 +56,7 @@ export function DashboardScreen() {
         <EmptyState
           icon="motorcycle"
           title="Add your first motorcycle"
-          body="Motrack tracks maintenance, fuel, and expenses per bike. Add one to get started."
+          body="Tolits tracks maintenance, fuel, and expenses per bike. Add one to get started."
           ctaLabel="Add motorcycle"
           onCtaPress={() => router.push('/bike/new')}
         />

@@ -16,7 +16,7 @@ export interface NewScheduledNotification {
 /**
  * `scheduled_notifications` (DATABASE_DESIGN.md §5.9) — operational, no soft
  * delete, excluded from backup. Tracks the OS handle for every notification
- * Motrack has scheduled so NotificationScheduler can cancel/diff on re-plan.
+ * Tolits has scheduled so NotificationScheduler can cancel/diff on re-plan.
  */
 export const ScheduledNotificationRepository = {
   listAll(): { id: string; notificationId: string; sourceType: string; sourceId: string | null; fireAt: number }[] {

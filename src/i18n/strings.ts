@@ -128,7 +128,7 @@ export const strings = {
   },
   onboarding: {
     welcome: {
-      title: 'Welcome to Motrack',
+      title: 'Welcome to Tolits',
       body: 'Your motorcycle logbook for maintenance, fuel, and expenses, all offline on your phone.',
       bulletMaintenance: 'Never miss an oil change with schedules and a live Health Score.',
       bulletMoney: 'Track fuel and every peso your bike costs.',
@@ -137,7 +137,7 @@ export const strings = {
       skipSetup: 'Skip setup',
     },
     carousel: {
-      brand: 'Motrack',
+      brand: 'Tolits',
       skip: 'Skip',
       next: 'Next',
       getStarted: 'Get started',
@@ -161,7 +161,7 @@ export const strings = {
     },
     language: {
       title: 'Choose your language',
-      body: 'Pick the language you want Motrack to use. You can change this anytime in Settings.',
+      body: 'Pick the language you want Tolits to use. You can change this anytime in Settings.',
       english: 'English',
       englishHint: 'Use English throughout the app',
       tagalog: 'Tagalog',
@@ -361,7 +361,7 @@ export const strings = {
     },
     documents: {
       title: 'Paperwork, handled',
-      body: 'Add OR/CR and insurance with expiry dates. Motrack warns you on the dashboard before they lapse.',
+      body: 'Add OR/CR and insurance with expiry dates. Tolits warns you on the dashboard before they lapse.',
     },
   },
   help: {
@@ -387,13 +387,13 @@ export const strings = {
       rowTitle: 'How to track maintenance dates',
       title: 'How to track maintenance dates',
       whenTitle: 'When to log a service',
-      whenBody: 'Log a maintenance item as soon as you finish it, like an oil change or a new set of brake pads. Motrack uses that date and odometer reading to plan the next one.',
+      whenBody: 'Log a maintenance item as soon as you finish it, like an oil change or a new set of brake pads. Tolits uses that date and odometer reading to plan the next one.',
       datesTitle: 'How dates work',
       datesBody: 'Each component remembers the last date it was serviced. You can update this anytime from the component screen in Maintenance, no need to set it during setup.',
       intervalsTitle: 'How odometer intervals work',
-      intervalsBody: 'Every component has a recommended interval, in kilometers, months, or both. Motrack counts from your last log to tell you roughly when the next one is due.',
+      intervalsBody: 'Every component has a recommended interval, in kilometers, months, or both. Tolits counts from your last log to tell you roughly when the next one is due.',
       remindersTitle: 'How reminders use this',
-      remindersBody: 'When a component is due soon or overdue, Motrack shows it on your dashboard and can send a reminder. Keeping your odometer updated keeps these estimates accurate.',
+      remindersBody: 'When a component is due soon or overdue, Tolits shows it on your dashboard and can send a reminder. Keeping your odometer updated keeps these estimates accurate.',
     },
   },
   /** Canonical copy templates — NOTIFICATION_ENGINE.md §8. Use with `interpolate`. */
@@ -437,7 +437,7 @@ export const strings = {
         document_expiry: 'Document expiry',
         backup_reminder: 'Backup reminders',
       },
-      permissionDenied: 'Notifications are turned off for Motrack in your device settings.',
+      permissionDenied: 'Notifications are turned off for Tolits in your device settings.',
       openSystemSettings: 'Open system settings',
     },
   },

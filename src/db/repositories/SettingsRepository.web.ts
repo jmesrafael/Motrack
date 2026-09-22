@@ -6,7 +6,7 @@
  * worker path.
  */
 
-const PREFIX = 'motrack:setting:';
+const PREFIX = 'tolits:setting:';
 
 function storage(): Storage | null {
   return typeof window === 'undefined' ? null : window.localStorage;

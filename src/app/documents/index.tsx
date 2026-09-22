@@ -42,7 +42,7 @@ export default function DocumentsRoute() {
         <EmptyState
           icon="shield"
           title="Keep OR/CR, insurance, receipts safe"
-          body="Add your first document and Motrack will warn you before it expires."
+          body="Add your first document and Tolits will warn you before it expires."
           ctaLabel="Add document"
           onCtaPress={() => router.push('/documents/new')}
         />

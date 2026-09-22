@@ -39,8 +39,8 @@ import {
 } from './validation/backupSchemas';
 
 const MAX_ARCHIVE_BYTES = 500 * 1024 * 1024;
-const STAGING_DB_NAME = 'motrack-restore-staging.db';
-const LIVE_DB_NAME = 'motrack.db';
+const STAGING_DB_NAME = 'tolits-restore-staging.db';
+const LIVE_DB_NAME = 'tolits.db';
 const DOCUMENTS_DIR_NAME = 'documents';
 const STAGING_DOCUMENTS_DIR_NAME = 'documents-restore-staging';
 const ASIDE_SUFFIX = '.pre-restore';
@@ -63,7 +63,7 @@ export interface RestorePreviewSummary {
 }
 
 const CORRUPT = () => appError('CorruptionError', 'restore.corrupt', 'Backup appears damaged. Try another copy.');
-const NOT_MOTRACK = () => appError('CorruptionError', 'restore.notAMotrackFile', "This file isn't a Motrack backup.");
+const NOT_TOLITS = () => appError('CorruptionError', 'restore.notATolitsFile', "This file isn't a Tolits backup.");
 
 function currentDataExists(): boolean {
   return (rawDb.getFirstSync<{ n: number }>('SELECT COUNT(*) AS n FROM motorcycles')?.n ?? 0) > 0;
@@ -78,7 +78,7 @@ export function previewRestore(
     bytes = new File(fileUri).bytesSync();
   } catch (cause) {
     log.error('restore.preview.readFailed', { error: String(cause) });
-    return err(NOT_MOTRACK());
+    return err(NOT_TOLITS());
   }
   if (bytes.length > MAX_ARCHIVE_BYTES) {
     return err(appError('FileError', 'restore.tooLarge', 'This backup file is too large (max 500 MB).'));
@@ -87,13 +87,13 @@ export function previewRestore(
   const { entries, rejectedPaths } = extractZip(bytes);
   if (rejectedPaths.length > 0) {
     log.error('restore.preview.unsafeEntries', { count: rejectedPaths.length });
-    return err(NOT_MOTRACK());
+    return err(NOT_TOLITS());
   }
 
   const manifestEntry = entries.find((e) => e.path === 'manifest.json');
   const dataEntry = entries.find((e) => e.path === 'data.json');
   if (manifestEntry === undefined || dataEntry === undefined) {
-    return err(NOT_MOTRACK());
+    return err(NOT_TOLITS());
   }
 
   let manifestJson: unknown;
@@ -108,19 +108,19 @@ export function previewRestore(
 
   const manifestResult = manifestSchema.safeParse(manifestJson);
   if (!manifestResult.success) {
-    return err(NOT_MOTRACK());
+    return err(NOT_TOLITS());
   }
   const manifest = manifestResult.data;
 
   if (!(SUPPORTED_FORMAT_VERSIONS as readonly number[]).includes(manifest.formatVersion)) {
-    return err(NOT_MOTRACK());
+    return err(NOT_TOLITS());
   }
   if (manifest.schemaVersion > currentSchemaVersion()) {
     return err(
       appError(
         'BusinessRuleError',
         'restore.newerSchema',
-        'Backup was made with a newer version — update Motrack first.',
+        'Backup was made with a newer version — update Tolits first.',
       ),
     );
   }

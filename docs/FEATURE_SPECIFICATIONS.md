@@ -114,7 +114,7 @@ Displayed on Dashboard (hero), Garage cards (chip), and component detail (per-it
 
 User-facing entry points in More → Backup and More → Export. Complete specs: [BACKUP_RECOVERY.md](BACKUP_RECOVERY.md) (archive format, restore safety) and [EXPORT_IMPORT.md](EXPORT_IMPORT.md) (CSV columns, PDF report layout). Monthly backup reminder notification per [NOTIFICATION_ENGINE.md](NOTIFICATION_ENGINE.md) §7.
 
-## 16. Motrack Pro (R-17)
+## 16. Tolits Pro (R-17)
 
 Purchase surface (paywall), restore purchases, and gate behavior: [PREMIUM_SYSTEM.md](PREMIUM_SYSTEM.md). The only MVP gate is the 2-bike limit (§3 above).
 

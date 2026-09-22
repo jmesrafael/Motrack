@@ -1,6 +1,6 @@
 # API_STRATEGY.md — Future API Surface
 
-> **Owns:** how Motrack exposes/consumes APIs across phases. MVP has **no API** — this document exists so MVP code doesn't foreclose the path. Sync specifics: [SUPABASE_SYNC_PLAN.md](SUPABASE_SYNC_PLAN.md); backend choice: ADR-020.
+> **Owns:** how Tolits exposes/consumes APIs across phases. MVP has **no API** — this document exists so MVP code doesn't foreclose the path. Sync specifics: [SUPABASE_SYNC_PLAN.md](SUPABASE_SYNC_PLAN.md); backend choice: ADR-020.
 
 ## 1. MVP — no API, by design
 

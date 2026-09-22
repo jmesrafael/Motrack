@@ -8,7 +8,7 @@
 |---|---|---|---|
 | D-001 | 2026-07-06 | Phase-2 backend target = **Supabase** | Owner-confirmed in planning Q&A; technical rationale ADR-020 |
 | D-002 | 2026-07-06 | Monetization = **one-time lifetime purchase**, overriding the brief's RevenueCat-subscription assumption | **Owner-decided** in planning Q&A; RevenueCat retained for entitlement plumbing (ADR-013) |
-| D-003 | 2026-07-06 | Working title **"Motrack"**, branding deferred | Owner: "focus on branding later"; token names kept brand-neutral ([DESIGN_SYSTEM.md](DESIGN_SYSTEM.md)) |
+| D-003 | 2026-07-06 | Working title **"Tolits"**, branding deferred | Owner: "focus on branding later"; token names kept brand-neutral ([DESIGN_SYSTEM.md](DESIGN_SYSTEM.md)) |
 | D-004 | 2026-07-06 | KB lives in `docs/`; docs are the constitution; doc-sync duty on every change | Owner-approved plan; process in [CONTRIBUTING.md](CONTRIBUTING.md) §1 |
 | D-005 | 2026-07-06 | Navigation = 5 tabs with center Log action; single **active bike** context scoping tab content | Optimizes P1/P2 speed-to-log ([USER_PERSONAS.md](USER_PERSONAS.md)); alternatives (per-bike tabs, drawer) worse for one-handed quick logging |
 | D-006 | 2026-07-06 | Free tier = full MVP with **2-motorcycle limit**; Pro = unlimited + Phase-2 features | Free tier must fully serve P1/P2 (1 bike) to build trust; P3 (3+ bikes) is the natural payer. Limit value is A-02 |
@@ -19,7 +19,7 @@
 | D-011 | 2026-07-06 | Store-only distribution at launch (no direct APK) | Update path + integrity; revisit post-launch if PH demand shows |
 | D-012 | 2026-07-06 | Phase-2 launch gate: formal RA-10173 legal review (DPO, NPC registration assessment, processor agreements) before any server-held personal data | MVP is low-exposure by design; server changes that ([SECURITY.md](SECURITY.md) §7) |
 | D-013 | 2026-07-06 | Free-vs-Pro split for Phase-2 sync/cloud backup: **deliberately undecided** until real cost data exists | Placeholder noted in [PREMIUM_SYSTEM.md](PREMIUM_SYSTEM.md) §2; deciding now would be invented economics |
-| D-014 | 2026-07-06 | No CSV *import* in MVP; imports = Motrack backup archives only; exports designed human-readable | Arbitrary-spreadsheet mapping is a support tarpit; own-format re-import path preserved ([EXPORT_IMPORT.md](EXPORT_IMPORT.md) §5) |
+| D-014 | 2026-07-06 | No CSV *import* in MVP; imports = Tolits backup archives only; exports designed human-readable | Arbitrary-spreadsheet mapping is a support tarpit; own-format re-import path preserved ([EXPORT_IMPORT.md](EXPORT_IMPORT.md) §5) |
 | D-015 | 2026-07-06 | Health Score excluded from the resale PDF | Point-in-time score without context misleads buyers; history speaks for itself |
 | D-016 | 2026-07-06 | CODING_STANDARDS.md merged into [CODE_STYLE.md](CODE_STYLE.md) (one style authority) | Two style docs would drift; suggested structure explicitly allowed merging |
 | D-017 | 2026-07-06 | Brief's competitor table corrected: Riderr/Revvo unverifiable; MotorManage/BikerGarage/MotoLogger confirmed; new entrants noted | Lightweight scan July 2026 ([PRODUCT_VISION.md](PRODUCT_VISION.md) §2) — per owner instruction, research kept minimal and decision-focused |

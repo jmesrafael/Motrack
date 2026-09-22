@@ -42,7 +42,7 @@ The pre-filled odometer in Quick Log uses the same projection: `current_effectiv
 
 On **any** of: maintenance record saved/edited/deleted · odometer log added/edited/deleted · fuel log saved (odometer) · schedule edited/enabled/disabled/muted · baseline set · document saved/deleted · bike archived/deleted · settings changed (fire time, quiet hours, toggles) · **every app foreground** (cheap no-op diff when nothing changed; this is also the reboot/timezone recovery path — see §9a):
 
-1. Cancel all pending notifications owned by Motrack (tracked in `scheduled_notifications`, [DATABASE_DESIGN.md](DATABASE_DESIGN.md) §5.9).
+1. Cancel all pending notifications owned by Tolits (tracked in `scheduled_notifications`, [DATABASE_DESIGN.md](DATABASE_DESIGN.md) §5.9).
 2. Compute the full desired plan across all non-archived bikes: for each enabled, anchored, un-muted schedule → §3/§4 entries; each document with expiry → §7; backup reminder → §7.
 3. Apply constraints: drop past dates except overdue logic (§6); quiet-hours shift (§6); dedup per schedule per day; **cap: 12 pending per bike, 48 total** (headroom under iOS's 64-pending limit) — priority order: overdue > document expiry > due soon > backup, then nearest-date first.
 4. Schedule via expo-notifications; persist `(notification_id, source_type, source_id, fire_at)` rows.

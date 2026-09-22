@@ -1,5 +1,5 @@
 /**
- * RideKeep brand palette — THE single place to change the product's identity.
+ * Tolits brand palette — THE single place to change the product's identity.
  *
  * Both themes (themes/dark.ts, themes/light.ts) derive their accent, hero and
  * status colors from here. Change `accent` and every button, ring, chip, FAB,
@@ -8,7 +8,7 @@
  */
 
 export const brand = {
-  /** Signature accent — lime on near-black is the RideKeep look. */
+  /** Signature accent — lime on near-black is the Tolits look. */
   accent: '#C8FF3D',
   accentPressed: '#B4EA2C',
   /** Ink used on top of the accent (buttons, hero card). */

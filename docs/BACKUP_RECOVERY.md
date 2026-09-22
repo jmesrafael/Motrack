@@ -15,7 +15,7 @@ More → Backup & Restore (S-32); flows F-9; monthly reminder ([NOTIFICATION_ENG
 
 ## 3. Archive format (ADR-018)
 
-Single file `motrack-backup-<yyyyMMdd-HHmm>.motrack` — a zip:
+Single file `tolits-backup-<yyyyMMdd-HHmm>.tolits` — a zip:
 
 ```
 manifest.json   { formatVersion: 1, appVersion, schemaVersion (PRAGMA user_version),
@@ -50,8 +50,8 @@ Failure at any step = automatic rollback to the pre-restore state + specific err
 
 | Case | Message behavior |
 |---|---|
-| Not a motrack file / corrupt zip | "This file isn't a Motrack backup." |
-| Newer schemaVersion | "Backup was made with a newer version — update Motrack first." |
+| Not a tolits file / corrupt zip | "This file isn't a Tolits backup." |
+| Newer schemaVersion | "Backup was made with a newer version — update Tolits first." |
 | Partial file loss (missing photos) | Restore completes; warning lists count; documents show placeholder |
 | Disk full mid-restore | Rollback + "Free up about {size} and try again." |
 | Validation failure | Rollback + "Backup appears damaged. Try another copy." + report option |

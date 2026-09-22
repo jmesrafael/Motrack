@@ -91,9 +91,9 @@
 **Decision:** Strict one-way layering with import rules lint-enforced; services are React-free TS ([SOFTWARE_ARCHITECTURE.md](SOFTWARE_ARCHITECTURE.md)).
 **Trade-offs:** More files/ceremony than "fetch in component" — the point.
 
-### ADR-018 · Export & backup formats: JSON-based `.motrack` archive; expo-print PDF; in-house CSV
+### ADR-018 · Export & backup formats: JSON-based `.tolits` archive; expo-print PDF; in-house CSV
 **Context:** Backup must survive schema versions and app reinstalls; raw SQLite file copies are opaque, version-brittle, and risk partial-write corruption.
-**Decision:** Backup = zip (`.motrack`) containing `manifest.json` (schema/app versions), `data.json` (full table export), and `files/` (documents/photos) ([BACKUP_RECOVERY.md](BACKUP_RECOVERY.md) §3). PDF via expo-print HTML templates; CSV via a small writer with proper escaping ([EXPORT_IMPORT.md](EXPORT_IMPORT.md)).
+**Decision:** Backup = zip (`.tolits`) containing `manifest.json` (schema/app versions), `data.json` (full table export), and `files/` (documents/photos) ([BACKUP_RECOVERY.md](BACKUP_RECOVERY.md) §3). PDF via expo-print HTML templates; CSV via a small writer with proper escaping ([EXPORT_IMPORT.md](EXPORT_IMPORT.md)).
 **Trade-offs:** Export/import code to maintain (vs file copy) — buys version-tolerant restores and partial recovery.
 
 ### ADR-019 · Health Score is always derived, never persisted

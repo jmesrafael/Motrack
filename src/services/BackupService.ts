@@ -1,5 +1,5 @@
 /**
- * Whole-data backup (BACKUP_RECOVERY.md §3, §6). Builds the `.motrack` archive
+ * Whole-data backup (BACKUP_RECOVERY.md §3, §6). Builds the `.tolits` archive
  * (manifest.json + data.json + files/) and either shares it (user-facing
  * backup) or writes it to a fixed internal path (pre-restore safety snapshot,
  * §4 step 5). RestoreService is the only other consumer of `buildArchive`.
@@ -33,7 +33,7 @@ import { guardService } from './serviceUtils';
 const FORMAT_VERSION = 1;
 const ENTITLEMENT_KEY_PREFIX = 'entitlement_';
 const INTERNAL_BACKUPS_DIR = 'backups';
-const INTERNAL_SNAPSHOT_NAME = 'pre-restore-safety.motrack';
+const INTERNAL_SNAPSHOT_NAME = 'pre-restore-safety.tolits';
 
 export function currentSchemaVersion(): number {
   return rawDb.getFirstSync<{ user_version: number }>('PRAGMA user_version')?.user_version ?? 0;
@@ -116,7 +116,7 @@ function backupFilename(): string {
   const now = new Date();
   const date = toIsoDate(now).replace(/-/g, '');
   const time = `${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
-  return `motrack-backup-${date}-${time}.motrack`;
+  return `tolits-backup-${date}-${time}.tolits`;
 }
 
 /** User-facing "Create backup" (S-32): builds the archive, opens the share sheet, marks `last_backup_at`. */

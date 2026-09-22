@@ -5,7 +5,7 @@
 ## 1. Repository root
 
 ```
-motrack/
+tolits/
   docs/                  # THE knowledge base (constitution) — see docs/README.md
   src/                   # application source — FOLDER_STRUCTURE.md
   assets/                # app icon, splash, onboarding/empty-state illustrations

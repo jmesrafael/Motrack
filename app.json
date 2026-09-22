@@ -1,14 +1,14 @@
 {
   "expo": {
-    "name": "Motrack",
-    "slug": "motrack",
+    "name": "Tolits",
+    "slug": "tolits",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "motrack",
+    "scheme": "tolits",
     "userInterfaceStyle": "automatic",
     "android": {
-      "package": "com.jamesrfael.motrack",
+      "package": "com.jamesrfael.tolits",
       "adaptiveIcon": {
         "backgroundColor": "#0A0A0A",
         "foregroundImage": "./assets/images/android-icon-foreground.png",

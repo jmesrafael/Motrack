@@ -13,7 +13,7 @@
 ## 2. First-time setup
 
 ```bash
-git clone <repo> && cd motrack
+git clone <repo> && cd tolits
 nvm use               # or fnm use
 npm ci                # frozen lockfile
 npm run typecheck && npm test    # sanity: green before you start

@@ -18,7 +18,7 @@
 | DB schema | integer `PRAGMA user_version` = migration count; forward-only | [DATABASE_DESIGN.md](DATABASE_DESIGN.md) §8 |
 | Seed config (intervals/weights) | integer `schema_seed_version` | [DATABASE_DESIGN.md](DATABASE_DESIGN.md) §9 |
 | Backup format | `formatVersion` integer; readers kept forever | [BACKUP_RECOVERY.md](BACKUP_RECOVERY.md) §3/§7 |
-| CSV export | `# motrack-csv v1` header | [EXPORT_IMPORT.md](EXPORT_IMPORT.md) §5 |
+| CSV export | `# tolits-csv v1` header | [EXPORT_IMPORT.md](EXPORT_IMPORT.md) §5 |
 | Health Score formula | `healthScoreVersion` (bump on any formula change) | [HEALTH_SCORE.md](HEALTH_SCORE.md) §9 |
 | Per-component `details` schemas | versioned Zod schemas in code | ADR-007 |
 | Edge-function API (Phase 2) | URL `/v1/` | [API_STRATEGY.md](API_STRATEGY.md) §2 |

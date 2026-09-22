@@ -33,7 +33,7 @@
 
 ## Anti-persona
 
-**"Track-day Tom"** — enthusiast with a liter bike, wants suspension-clicker logs, lap times, dyno charts, mod lists. Serving him bloats every screen. Motrack politely does not target him ([PROJECT_MISSION.md](PROJECT_MISSION.md) §4).
+**"Track-day Tom"** — enthusiast with a liter bike, wants suspension-clicker logs, lap times, dyno charts, mod lists. Serving him bloats every screen. Tolits politely does not target him ([PROJECT_MISSION.md](PROJECT_MISSION.md) §4).
 
 ## Persona priority rule
 

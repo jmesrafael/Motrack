@@ -2,7 +2,7 @@
 
 > **Owns:** the design tokens — names and values, for every registered theme. **Does not own:** the theme engine that delivers them ([THEME_GUIDE.md](THEME_GUIDE.md)), component anatomy ([COMPONENT_LIBRARY.md](COMPONENT_LIBRARY.md)), interaction principles ([UI_UX_GUIDELINES.md](UI_UX_GUIDELINES.md)). Tokens are the only place raw values live; components must consume tokens, never hex/px literals ([CODE_STYLE.md](CODE_STYLE.md) §7).
 >
-> Brand note: Motrack's visual identity is provisional (D-003, A-17). The token *names* are the stable contract; a branding pass or a new theme changes values only.
+> Brand note: Tolits's visual identity is provisional (D-003, A-17). The token *names* are the stable contract; a branding pass or a new theme changes values only.
 
 ## 1. Token model & semantic colors
 

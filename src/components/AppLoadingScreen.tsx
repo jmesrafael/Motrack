@@ -12,7 +12,7 @@ export function AppLoadingScreen() {
   return (
     <View style={[styles.root, { backgroundColor: tokens.bg.page }]}>
       <View style={[styles.mark, { backgroundColor: tokens.primary.base }]} />
-      <Text style={[styles.word, { color: tokens.text.primary }]}>Motrack</Text>
+      <Text style={[styles.word, { color: tokens.text.primary }]}>Tolits</Text>
       <ActivityIndicator color={tokens.primary.base} style={styles.spinner} />
     </View>
   );

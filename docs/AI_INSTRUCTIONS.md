@@ -1,6 +1,6 @@
 # AI_INSTRUCTIONS.md — How an AI Model Builds From This Knowledge Base
 
-> Instructions for any AI system (or engineer pairing with one) implementing Motrack. The KB in this folder is the constitution ([DEVELOPMENT_RULES.md](DEVELOPMENT_RULES.md) rule 8). These instructions assume you may have no memory of prior sessions — the docs are designed so that's fine.
+> Instructions for any AI system (or engineer pairing with one) implementing Tolits. The KB in this folder is the constitution ([DEVELOPMENT_RULES.md](DEVELOPMENT_RULES.md) rule 8). These instructions assume you may have no memory of prior sessions — the docs are designed so that's fine.
 
 ## 1. Session protocol
 

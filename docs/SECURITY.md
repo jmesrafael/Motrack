@@ -37,7 +37,7 @@ Everything exportable (CSV/PDF) and backupable free ([PROJECT_MISSION.md](PROJEC
 
 ## 7. PH Data Privacy Act (RA 10173) compliance
 
-Motrack MVP is deliberately low-exposure: personal data is **processed and stored only on the user's own device**, by the user, for the user — no transmission to us except anonymized crash telemetry.
+Tolits MVP is deliberately low-exposure: personal data is **processed and stored only on the user's own device**, by the user, for the user — no transmission to us except anonymized crash telemetry.
 
 | Obligation | How met |
 |---|---|
@@ -47,7 +47,7 @@ Motrack MVP is deliberately low-exposure: personal data is **processed and store
 | User rights (access/erasure/portability) | §6 — export + delete-all are first-class features |
 | Breach notification readiness | MVP: no server-held personal data → breach surface ≈ nil. Phase 2 (§9) adds DPO designation, NPC registration assessment, processor agreements (Supabase), breach runbook — gate items in the Phase-2 plan |
 
-Documents photographed by users (own OR/CR, own license) are the user's own records on their own device — Motrack is not a processor of third parties' data in MVP. Re-assess at Phase 2 when data reaches our servers (this is a launch-gate legal review item, [DECISION_LOG.md](DECISION_LOG.md) D-012).
+Documents photographed by users (own OR/CR, own license) are the user's own records on their own device — Tolits is not a processor of third parties' data in MVP. Re-assess at Phase 2 when data reaches our servers (this is a launch-gate legal review item, [DECISION_LOG.md](DECISION_LOG.md) D-012).
 
 ## 8. User safety (product-level)
 

@@ -4,7 +4,7 @@
 
 ## 1. Connection & pragmas
 
-One database (`motrack.db`), one long-lived connection opened by `src/db/client.ts` at startup:
+One database (`tolits.db`), one long-lived connection opened by `src/db/client.ts` at startup:
 
 ```
 PRAGMA journal_mode = WAL;        -- concurrent read during write; crash-safe

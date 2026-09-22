@@ -1,10 +1,10 @@
-# PREMIUM_SYSTEM.md — Motrack Pro Gating
+# PREMIUM_SYSTEM.md — Tolits Pro Gating
 
 > **Owns:** the free/Pro boundary, entitlement architecture, purchase flows, and edge cases. Policy summary: [PRODUCT_DECISIONS.md](PRODUCT_DECISIONS.md) §8; decision history: D-002; technical choice: ADR-013/023.
 
 ## 1. Model
 
-**One-time lifetime purchase — "Motrack Pro"** via RevenueCat non-consumable, entitlement id `pro`. No subscription anywhere in the consumer app (B2B fleet SaaS is a separate long-term product, [FUTURE_ROADMAP.md](FUTURE_ROADMAP.md)). Price configured in store consoles/RevenueCat (placeholder assumption ₱499 ≈ $8.99 — A-09, owner to confirm).
+**One-time lifetime purchase — "Tolits Pro"** via RevenueCat non-consumable, entitlement id `pro`. No subscription anywhere in the consumer app (B2B fleet SaaS is a separate long-term product, [FUTURE_ROADMAP.md](FUTURE_ROADMAP.md)). Price configured in store consoles/RevenueCat (placeholder assumption ₱499 ≈ $8.99 — A-09, owner to confirm).
 
 ## 2. The authoritative gate list
 

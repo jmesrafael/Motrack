@@ -158,7 +158,7 @@ Template per screen: **Purpose · Layout · Components · Navigation · Validati
 ## More & settings
 
 ### S-30 More (tab root)
-- **Layout:** list: Garage · Documents · Statistics · Reminders · Export · Backup & Restore · **Motrack Pro** (status row: "Free — 2/2 bikes" or "Pro ✓") · Settings (language, theme, notifications) · Data & privacy · About.
+- **Layout:** list: Garage · Documents · Statistics · Reminders · Export · Backup & Restore · **Tolits Pro** (status row: "Free — 2/2 bikes" or "Pro ✓") · Settings (language, theme, notifications) · Data & privacy · About.
 - **Theme setting:** picker listing **System default** + every registered theme from the theme registry ([THEME_GUIDE.md](THEME_GUIDE.md) §5) — applies instantly on selection, persisted.
 
 ### S-31 Notification settings

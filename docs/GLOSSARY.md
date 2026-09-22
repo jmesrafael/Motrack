@@ -10,12 +10,12 @@
 | **CVT belt (drive belt)** | Rubber belt transferring engine power in a CVT. Wear item; snapping strands a rider. |
 | **Rollers (weight rollers)** | Cylindrical weights inside the CVT variator controlling gear ratio; wear flat over time causing sluggish acceleration. |
 | **Slider (slider piece)** | Plastic guide pieces in the CVT variator; wear item replaced alongside rollers. |
-| **Drivetrain type** | Motrack's classification of how power reaches the wheel: `cvt` (scooters), `chain` (underbones/sport bikes), `other` (shaft/belt-drive, rare in PH). Gates which components apply to a bike. |
+| **Drivetrain type** | Tolits's classification of how power reaches the wheel: `cvt` (scooters), `chain` (underbones/sport bikes), `other` (shaft/belt-drive, rare in PH). Gates which components apply to a bike. |
 | **Underbone** | Small motorcycle with step-through frame and chain drive (e.g., Suzuki Raider, Honda Wave). Very common in PH. |
 | **Gear oil** | Oil for the final-drive gearbox of a scooter (separate from engine oil). |
 | **Sprockets** | Toothed wheels engaging the chain (front/engine + rear/wheel); replaced as a set with the chain. |
-| **Tread depth** | Remaining tire groove depth; Motrack tracks "remaining %" as user-estimated. |
-| **Odometer** | The bike's total-distance meter. In Motrack, an *odometer reading* is a whole, non-negative km value at a point in time. |
+| **Tread depth** | Remaining tire groove depth; Tolits tracks "remaining %" as user-estimated. |
+| **Odometer** | The bike's total-distance meter. In Tolits, an *odometer reading* is a whole, non-negative km value at a point in time. |
 | **OR/CR** | Official Receipt / Certificate of Registration — the two documents proving motorcycle registration in the Philippines. Renewed annually with LTO. |
 | **LTO** | Land Transportation Office — Philippine agency handling vehicle registration and driver's licenses. |
 | **Registration cycle** | PH motorcycles re-register yearly; the month is determined by the plate number's last digit. |
@@ -25,7 +25,7 @@
 | **Talyer** | Filipino colloquial term for a small motorcycle repair shop. Used in UX copy where appropriate. |
 | **Preventive maintenance (PMS)** | Scheduled service at fixed intervals; PH dealers call it "PMS" (Preventive Maintenance Service). |
 
-## Motrack product concepts
+## Tolits product concepts
 
 | Term | Definition |
 |---|---|
@@ -43,8 +43,8 @@
 | **Document vault** | The Documents feature storing OR/CR, insurance, license, receipts as photos/PDFs in app-private storage. |
 | **Fuel log** | One refueling event: liters, cost, odometer, station, full-tank flag. |
 | **Full-tank flag** | Marks a fill-up as "filled to full"; consumption math only uses full-to-full spans ([BUSINESS_RULES.md](BUSINESS_RULES.md) §7). |
-| **Pro / Motrack Pro** | The one-time lifetime premium unlock. Gate list in [PREMIUM_SYSTEM.md](PREMIUM_SYSTEM.md). |
-| **Backup archive** | Single `.motrack` file containing full database export + documents, for manual backup/restore ([BACKUP_RECOVERY.md](BACKUP_RECOVERY.md)). |
+| **Pro / Tolits Pro** | The one-time lifetime premium unlock. Gate list in [PREMIUM_SYSTEM.md](PREMIUM_SYSTEM.md). |
+| **Backup archive** | Single `.tolits` file containing full database export + documents, for manual backup/restore ([BACKUP_RECOVERY.md](BACKUP_RECOVERY.md)). |
 
 ## Technical terms (project-specific usage)
 

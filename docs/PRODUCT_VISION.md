@@ -1,6 +1,6 @@
 # PRODUCT_VISION.md — Users, Positioning, Competitive Stance
 
-> Who Motrack serves, where it wins, and the product philosophy in depth. Mission and metrics: [PROJECT_MISSION.md](PROJECT_MISSION.md). Concrete personas: [USER_PERSONAS.md](USER_PERSONAS.md). Scope boundaries: [PRODUCT_REQUIREMENTS.md](PRODUCT_REQUIREMENTS.md).
+> Who Tolits serves, where it wins, and the product philosophy in depth. Mission and metrics: [PROJECT_MISSION.md](PROJECT_MISSION.md). Concrete personas: [USER_PERSONAS.md](USER_PERSONAS.md). Scope boundaries: [PRODUCT_REQUIREMENTS.md](PRODUCT_REQUIREMENTS.md).
 
 ## 1. Target users (priority order)
 
@@ -31,7 +31,7 @@ The brief's original competitor table was a brainstorm. A verification scan (Jul
 3. **Unreliable/odd reminders**, especially time-based. → The notification engine is specified to the day and re-planned on every data change ([NOTIFICATION_ENGINE.md](NOTIFICATION_ENGINE.md)).
 4. **Apps going read-only offline.** → Hard offline guarantee ([OFFLINE_ARCHITECTURE.md](OFFLINE_ARCHITECTURE.md)).
 
-## 3. Where Motrack wins
+## 3. Where Tolits wins
 
 1. **Philippines-native**: PH registration cycles and LTO document reminders, ₱ costs, Filipino localization, the actual bikes people ride (Click, NMAX, Raider, Wave — see [GLOSSARY.md](GLOSSARY.md)), CVT-first component model. No verified competitor does any of this.
 2. **Radical logging speed**: Quick Log ≤ 10 seconds, last-used values pre-filled ([USER_FLOWS.md](USER_FLOWS.md) F-2).
